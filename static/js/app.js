@@ -93,13 +93,25 @@ function handleRoute(path) {
   const container = document.getElementById('app-content');
   if (!container) return;
 
-  // Highlight active nav links
+  // Highlight active desktop nav links
   document.querySelectorAll('.nav-link').forEach(el => {
     const href = el.getAttribute('href');
     if (href === path) {
-      el.classList.add('bg-gray-800', 'text-white');
+      el.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400');
     } else {
-      el.classList.remove('bg-gray-800');
+      el.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-blue-600', 'dark:text-blue-400');
+    }
+  });
+
+  // Highlight active mobile bottom navigation
+  document.querySelectorAll('.mobile-bottom-link').forEach(el => {
+    const href = el.getAttribute('href');
+    if (href === path) {
+      el.classList.add('text-blue-600', 'dark:text-blue-400', 'font-black');
+      el.classList.remove('text-slate-500', 'dark:text-slate-400');
+    } else {
+      el.classList.remove('text-blue-600', 'dark:text-blue-400', 'font-black');
+      el.classList.add('text-slate-500', 'dark:text-slate-400');
     }
   });
 

@@ -249,3 +249,41 @@ html.dark .custom-table tr:hover td {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Multi-Device Responsive Optimizations */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 4.5rem; /* Safe padding for sticky mobile nav */
+  }
+  .stat-card {
+    padding: 0.875rem;
+  }
+  .custom-table th, .custom-table td {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-2xl {
+    font-size: 1.25rem !important;
+  }
+  .text-3xl {
+    font-size: 1.5rem !important;
+  }
+  .p-6 {
+    padding: 1rem !important;
+  }
+  .p-8 {
+    padding: 1.25rem !important;
+  }
+}
+
+/* No Scrollbar Utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
