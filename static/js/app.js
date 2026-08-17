@@ -243,27 +243,27 @@ function renderHomePage(container) {
     <div class="space-y-10">
       
       <!-- Hero Banner -->
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-950 via-gray-900 to-indigo-950 border border-blue-900/40 p-8 sm:p-12 shadow-2xl">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-8 sm:p-12 shadow-xl">
         <div class="relative z-10 max-w-2xl space-y-4">
-          <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-3 py-1 text-xs text-blue-400 font-semibold">
-            <span class="pulse-dot"></span>
+          <div class="inline-flex items-center space-x-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 text-xs font-semibold text-blue-100">
+            <span class="pulse-dot bg-emerald-400"></span>
             <span>Live IPO Ingestion & Registrar Sync Active</span>
           </div>
-          <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Track Live IPO <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">GMP & Allotment</span> in Real-Time
+          <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+            Track Indian IPOs <span class="text-emerald-300">GMP & Allotment</span> in Real Time
           </h1>
-          <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
-            Production-ready Indian IPO tracking suite. Instant Grey Market Premium rates, live QIB/Retail subscription statistics, bulk PAN allotment status checking, and deep financial research.
+          <p class="text-blue-100 text-sm sm:text-base leading-relaxed">
+            Live Grey Market Premium rates, QIB/Retail subscription figures, single & bulk PAN allotment status checking, and deep financial research.
           </p>
           <div class="flex flex-wrap gap-3 pt-2">
-            <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-600/30 transition flex items-center">
-              <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i> Check IPO Allotment
+            <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-5 py-3 bg-white text-blue-900 hover:bg-blue-50 font-bold rounded-xl text-sm shadow-md transition flex items-center">
+              <i data-lucide="check-circle" class="w-4 h-4 mr-2 text-blue-600"></i> Check IPO Allotment
             </a>
-            <a href="/gmp" onclick="navigateTo('/gmp'); return false;" class="px-5 py-3 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 font-bold rounded-xl text-sm transition flex items-center">
-              <i data-lucide="zap" class="w-4 h-4 mr-2"></i> View Live GMP Dashboard
+            <a href="/gmp" onclick="navigateTo('/gmp'); return false;" class="px-5 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-300/40 text-white font-bold rounded-xl text-sm transition flex items-center">
+              <i data-lucide="zap" class="w-4 h-4 mr-2 text-emerald-300"></i> View Live GMP Dashboard
             </a>
-            <a href="/calculator" onclick="navigateTo('/calculator'); return false;" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold rounded-xl text-sm transition flex items-center">
-              <i data-lucide="calculator" class="w-4 h-4 mr-2"></i> Allotment Calculator
+            <a href="/calculator" onclick="navigateTo('/calculator'); return false;" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-300/40 text-amber-200 font-bold rounded-xl text-sm transition flex items-center">
+              <i data-lucide="calculator" class="w-4 h-4 mr-2 text-amber-300"></i> Allotment Calculator
             </a>
           </div>
         </div>
@@ -272,37 +272,37 @@ function renderHomePage(container) {
       <!-- Live GMP Highlights Grid -->
       <div class="space-y-4">
         <div class="flex justify-between items-center">
-          <h2 class="text-xl font-extrabold text-white flex items-center">
-            <i data-lucide="flame" class="w-5 h-5 text-amber-400 mr-2"></i> Today's Live GMP Highlights
+          <h2 class="text-xl font-black text-slate-900 flex items-center">
+            <i data-lucide="flame" class="w-5 h-5 text-amber-500 mr-2"></i> Today's Live GMP Highlights
           </h2>
-          <a href="/gmp" onclick="navigateTo('/gmp'); return false;" class="text-xs font-semibold text-blue-400 hover:underline">View All GMP &rarr;</a>
+          <a href="/gmp" onclick="navigateTo('/gmp'); return false;" class="text-xs font-semibold text-blue-600 hover:underline">View All GMP &rarr;</a>
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           ${state.ipos.slice(0, 4).map(ipo => {
             const g = ipo.gmp || { gmp_amount: 0, gmp_percent: 0, estimated_listing_price: ipo.upper_price, estimated_profit_per_lot: 0 };
             return `
-              <div onclick="navigateTo('/ipo/${ipo.slug}')" class="stat-card cursor-pointer space-y-3 relative group">
+              <div onclick="navigateTo('/ipo/${ipo.slug}')" class="stat-card cursor-pointer space-y-3 relative group bg-white border border-slate-200">
                 <div class="flex justify-between items-start">
                   <div>
                     <span class="badge ${ipo.category === 'Mainboard' ? 'badge-mainboard' : 'badge-sme'} mb-1">${ipo.category}</span>
-                    <h3 class="font-bold text-white text-base group-hover:text-blue-400 transition">${ipo.name}</h3>
+                    <h3 class="font-bold text-slate-900 text-base group-hover:text-blue-600 transition">${ipo.name}</h3>
                   </div>
                   <span class="badge ${ipo.status === 'Ongoing' ? 'badge-open' : (ipo.status === 'Listed' ? 'badge-listed' : 'badge-upcoming')}">${ipo.status}</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-800">
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
                   <div>
-                    <span class="text-[11px] text-gray-400">Issue Price</span>
-                    <div class="text-sm font-bold text-white">₹${ipo.upper_price}</div>
+                    <span class="text-[11px] text-slate-500">Issue Price</span>
+                    <div class="text-sm font-bold text-slate-900">₹${ipo.upper_price}</div>
                   </div>
                   <div>
-                    <span class="text-[11px] text-gray-400">Live GMP</span>
-                    <div class="text-sm font-extrabold text-emerald-400">+₹${g.gmp_amount} (${g.gmp_percent}%)</div>
+                    <span class="text-[11px] text-slate-500">Live GMP</span>
+                    <div class="text-sm font-black text-emerald-600">+₹${g.gmp_amount} (${g.gmp_percent}%)</div>
                   </div>
                 </div>
-                <div class="bg-gray-900 p-2 rounded-lg flex justify-between items-center text-xs">
-                  <span class="text-gray-400">Est. Profit/Lot:</span>
-                  <span class="font-bold text-emerald-400">₹${g.estimated_profit_per_lot.toLocaleString()}</span>
+                <div class="bg-slate-50 p-2 rounded-lg flex justify-between items-center text-xs border border-slate-100">
+                  <span class="text-slate-600">Est. Profit/Lot:</span>
+                  <span class="font-bold text-emerald-700">₹${g.estimated_profit_per_lot.toLocaleString()}</span>
                 </div>
               </div>
             `;
@@ -310,57 +310,57 @@ function renderHomePage(container) {
         </div>
       </div>
 
-      <!-- Ongoing & Upcoming IPO Split View -->
+      <!-- Ongoing & Quick Allotment Split View -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         <!-- Ongoing IPOs -->
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
           <div class="flex justify-between items-center">
-            <h3 class="text-lg font-bold text-white flex items-center">
+            <h3 class="text-lg font-bold text-slate-900 flex items-center">
               <span class="pulse-dot mr-2"></span> Ongoing IPO Bidding
             </h3>
-            <span class="text-xs text-gray-400">Open for subscription</span>
+            <span class="text-xs text-slate-500">Open for subscription</span>
           </div>
           <div class="space-y-3">
             ${ongoing.length > 0 ? ongoing.map(ipo => `
-              <div onclick="navigateTo('/ipo/${ipo.slug}')" class="p-4 bg-gray-800/60 hover:bg-gray-800 rounded-xl border border-gray-700/50 cursor-pointer transition flex justify-between items-center">
+              <div onclick="navigateTo('/ipo/${ipo.slug}')" class="p-4 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 cursor-pointer transition flex justify-between items-center">
                 <div>
-                  <div class="font-bold text-white text-sm">${ipo.name}</div>
-                  <div class="text-xs text-gray-400">Closes: <span class="text-rose-400 font-semibold">${ipo.close_date || 'N/A'}</span> • Lot: ${ipo.lot_size} shares</div>
+                  <div class="font-bold text-slate-900 text-sm">${ipo.name}</div>
+                  <div class="text-xs text-slate-500">Closes: <span class="text-rose-600 font-semibold">${ipo.close_date || 'N/A'}</span> • Lot: ${ipo.lot_size} shares</div>
                 </div>
                 <div class="text-right">
-                  <div class="text-sm font-extrabold text-emerald-400">+₹${ipo.gmp ? ipo.gmp.gmp_amount : 0} GMP</div>
-                  <div class="text-xs text-blue-400 font-medium">${ipo.subscription ? ipo.subscription.total_x + 'x Subscribed' : 'Live Data'}</div>
+                  <div class="text-sm font-black text-emerald-600">+₹${ipo.gmp ? ipo.gmp.gmp_amount : 0} GMP</div>
+                  <div class="text-xs text-blue-600 font-bold">${ipo.subscription ? ipo.subscription.total_x + 'x Subscribed' : 'Live Data'}</div>
                 </div>
               </div>
-            `).join('') : '<div class="text-xs text-gray-400 py-4 text-center">No ongoing IPOs today. Check upcoming list.</div>'}
+            `).join('') : '<div class="text-xs text-slate-500 py-4 text-center">No ongoing IPOs today. Check upcoming list.</div>'}
           </div>
         </div>
 
         <!-- Quick Allotment Lookup Widget -->
-        <div class="bg-gradient-to-br from-gray-900 via-gray-900 to-blue-950 border border-gray-800 rounded-2xl p-6 space-y-4 shadow-xl">
-          <h3 class="text-lg font-bold text-white flex items-center">
-            <i data-lucide="shield-check" class="w-5 h-5 text-blue-400 mr-2"></i> Quick IPO Allotment Checker
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center">
+            <i data-lucide="shield-check" class="w-5 h-5 text-blue-600 mr-2"></i> Quick IPO Allotment Checker
           </h3>
-          <p class="text-xs text-gray-300">
-            Check your IPO application status across Link Intime, KFintech, Bigshare, and Maashitla directly.
+          <p class="text-xs text-slate-600">
+            Check your application status across Link Intime, KFintech, Bigshare, and Maashitla directly.
           </p>
           <div class="space-y-3">
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">Select IPO</label>
-              <select id="home-ipo-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-blue-500">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Select IPO</label>
+              <select id="home-ipo-select" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm text-slate-900 focus:border-blue-600">
                 ${state.ipos.map(i => `<option value="${i.id}">${i.name}</option>`).join('')}
               </select>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-1">PAN Number</label>
-              <input type="text" id="home-pan-input" uppercase placeholder="Enter 10-digit PAN (e.g. ABCDE1234F)" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-blue-500 font-mono uppercase">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">PAN Number</label>
+              <input type="text" id="home-pan-input" uppercase placeholder="Enter 10-digit PAN (e.g. ABCDE1234F)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm text-slate-900 focus:border-blue-600 font-mono uppercase">
             </div>
             <div class="flex space-x-3">
-              <button onclick="handleHomeQuickCheck()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-sm transition">
+              <button onclick="handleHomeQuickCheck()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition">
                 Check Status
               </button>
-              <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-semibold rounded-xl text-sm transition text-center">
+              <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition text-center">
                 Bulk Check
               </a>
             </div>
@@ -371,28 +371,28 @@ function renderHomePage(container) {
       </div>
 
       <!-- Educational & Guides Section -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
         <div class="flex justify-between items-center">
-          <h3 class="text-lg font-bold text-white flex items-center">
-            <i data-lucide="book-open" class="w-5 h-5 text-indigo-400 mr-2"></i> Educational Guides & IPO News
+          <h3 class="text-lg font-bold text-slate-900 flex items-center">
+            <i data-lucide="book-open" class="w-5 h-5 text-indigo-600 mr-2"></i> Educational Guides & IPO News
           </h3>
-          <a href="/blog" onclick="navigateTo('/blog'); return false;" class="text-xs text-blue-400 font-semibold hover:underline">Explore All Guides &rarr;</a>
+          <a href="/blog" onclick="navigateTo('/blog'); return false;" class="text-xs text-blue-600 font-semibold hover:underline">Explore All Guides &rarr;</a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div onclick="navigateTo('/blog/how-to-check-ipo-allotment-status-online')" class="p-4 bg-gray-800/60 hover:bg-gray-800 rounded-xl border border-gray-700/50 cursor-pointer space-y-2">
+          <div onclick="navigateTo('/blog/how-to-check-ipo-allotment-status-online')" class="p-4 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 cursor-pointer space-y-2">
             <span class="badge badge-mainboard">Guide</span>
-            <h4 class="font-bold text-white text-sm">How to Check IPO Allotment Status Online</h4>
-            <p class="text-xs text-gray-400">Step-by-step guide for Link Intime, KFintech, and BSE status checking.</p>
+            <h4 class="font-bold text-slate-900 text-sm">How to Check IPO Allotment Status Online</h4>
+            <p class="text-xs text-slate-600">Step-by-step guide for Link Intime, KFintech, and BSE status checking.</p>
           </div>
-          <div onclick="navigateTo('/blog/what-is-ipo-gmp-how-it-is-calculated')" class="p-4 bg-gray-800/60 hover:bg-gray-800 rounded-xl border border-gray-700/50 cursor-pointer space-y-2">
+          <div onclick="navigateTo('/blog/what-is-ipo-gmp-how-it-is-calculated')" class="p-4 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 cursor-pointer space-y-2">
             <span class="badge badge-open">GMP Explained</span>
-            <h4 class="font-bold text-white text-sm">What is IPO GMP & How to Calculate Return</h4>
-            <p class="text-xs text-gray-400">Learn how estimated listing price and profit per lot are computed.</p>
+            <h4 class="font-bold text-slate-900 text-sm">What is IPO GMP & How to Calculate Return</h4>
+            <p class="text-xs text-slate-600">Learn how estimated listing price and profit per lot are computed.</p>
           </div>
-          <div onclick="navigateTo('/blog/mainboard-vs-sme-ipo-key-differences')" class="p-4 bg-gray-800/60 hover:bg-gray-800 rounded-xl border border-gray-700/50 cursor-pointer space-y-2">
+          <div onclick="navigateTo('/blog/mainboard-vs-sme-ipo-key-differences')" class="p-4 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 cursor-pointer space-y-2">
             <span class="badge badge-sme">SME vs Mainboard</span>
-            <h4 class="font-bold text-white text-sm">Mainboard IPO vs SME IPO Differences</h4>
-            <p class="text-xs text-gray-400">Compare issue size, lot sizes, trading rules, and risk profiles.</p>
+            <h4 class="font-bold text-slate-900 text-sm">Mainboard IPO vs SME IPO Differences</h4>
+            <p class="text-xs text-slate-600">Compare issue size, lot sizes, trading rules, and risk profiles.</p>
           </div>
         </div>
       </div>
