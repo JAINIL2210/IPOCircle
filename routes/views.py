@@ -3,6 +3,7 @@ from flask import Blueprint, render_template
 views = Blueprint('views', __name__)
 
 @views.route('/')
+@views.route('/screener')
 @views.route('/ipo')
 @views.route('/ipo/upcoming')
 @views.route('/ipo/ongoing')
@@ -19,7 +20,9 @@ views = Blueprint('views', __name__)
 @views.route('/ipo/<slug>')
 @views.route('/reviews')
 @views.route('/blog')
+@views.route('/blogs')
 @views.route('/blog/<slug>')
+@views.route('/blogs/<slug>')
 @views.route('/watchlist')
 @views.route('/admin')
 def index_view(slug=None):
