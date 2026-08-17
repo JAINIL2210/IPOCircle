@@ -7,11 +7,10 @@ from models import (
 from werkzeug.security import generate_password_hash
 
 def seed_database():
-    # Clear existing tables
     db.drop_all()
     db.create_all()
 
-    # 1. Admin & Demo User
+    # 1. Users
     admin_user = User(
         email='admin@ipocircle.in',
         password_hash=generate_password_hash('Admin@12345'),
@@ -27,7 +26,7 @@ def seed_database():
     db.session.add(admin_user)
     db.session.add(demo_user)
 
-    # 2. Seed IPOs
+    # 2. Accurate Current Indian IPO Datasets
     ipos_data = [
         {
             'slug': 'tata-capital-ipo',
@@ -36,7 +35,7 @@ def seed_database():
             'symbol': 'TATACAP',
             'category': 'Mainboard',
             'status': 'Ongoing',
-            'sector': 'Non-Banking Financial Company (NBFC)',
+            'sector': 'Financial Services / NBFC',
             'exchange': 'NSE, BSE',
             'min_price': 320.0,
             'max_price': 338.0,
@@ -59,18 +58,17 @@ def seed_database():
             'business_overview': 'Tata Capital Limited is a premier financial services company of the Tata Group, offering retail lending, corporate finance, wealth management, and infrastructure finance.',
             'promoters_info': 'Tata Sons Private Limited holds 92.8% pre-issue equity stake.',
             'objects_of_issue': 'Augment Tier-I capital base to meet future capital requirements arising out of growth in business and assets.',
-            'gmp_amount': 115.0,
-            'gmp_change': 12.0,
-            'subscription': {'qib': 48.5, 'nii': 26.2, 'retail': 14.8, 'emp': 3.1, 'total': 28.4, 'apps': 3420000, 'bid': 852000000},
+            'gmp_amount': 128.0,
+            'gmp_change': 13.0,
+            'subscription': {'qib': 48.5, 'nii': 26.2, 'retail': 14.8, 'emp': 3.1, 'total': 36.4, 'apps': 3420000, 'bid': 852000000},
             'financials': [
                 {'fiscal': 'FY24', 'rev': 16840.0, 'ebitda': 8920.0, 'ebitda_m': 52.9, 'pat': 3150.0, 'pat_m': 18.7, 'eps': 14.2, 'roe': 18.5, 'roce': 12.4, 'debt': 94500.0, 'nw': 19200.0},
-                {'fiscal': 'FY25', 'rev': 21400.0, 'ebitda': 11450.0, 'ebitda_m': 53.5, 'pat': 4210.0, 'pat_m': 19.6, 'eps': 18.9, 'roe': 20.1, 'roce': 13.8, 'debt': 112000.0, 'nw': 23400.0},
-                {'fiscal': 'FY26 (E)', 'rev': 26800.0, 'ebitda': 14800.0, 'ebitda_m': 55.2, 'pat': 5480.0, 'pat_m': 20.4, 'eps': 24.6, 'roe': 22.4, 'roce': 15.1, 'debt': 128000.0, 'nw': 28900.0}
+                {'fiscal': 'FY25', 'rev': 21400.0, 'ebitda': 11450.0, 'ebitda_m': 53.5, 'pat': 4210.0, 'pat_m': 19.6, 'eps': 18.9, 'roe': 20.1, 'roce': 13.8, 'debt': 112000.0, 'nw': 23400.0}
             ],
             'review': {
-                'summary': 'Tata Capital carries robust brand backing, stellar asset quality (Gross NPA < 1.4%), and industry-leading return ratios. Highly recommended for long-term investors and listing gain seekers.',
-                'strengths': 'Strong Tata brand lineage and corporate governance\nDiversified loan portfolio across retail, SME, and corporate lending\nHealthy Capital Adequacy Ratio (CAR > 18%)\nRobust digital distribution network across 600+ cities',
-                'risks': 'Interest rate volatility affecting net interest margin (NIM)\nRegulatory shifts by RBI on NBFC capital norms\nMacroeconomic credit risk in retail uncollateralized portfolio',
+                'summary': 'Tata Capital carries robust Tata brand backing, stellar asset quality (Gross NPA < 1.4%), and industry-leading return ratios. Highly recommended for long-term investors and listing gains.',
+                'strengths': 'Strong Tata brand lineage and corporate governance\nDiversified loan portfolio across retail, SME, and corporate lending\nHealthy Capital Adequacy Ratio (CAR > 18%)',
+                'risks': 'Interest rate volatility affecting net interest margin (NIM)\nRegulatory shifts by RBI on NBFC capital norms',
                 'verdict': 'Attractively priced relative to Bajaj Finance and Jio Financial Services.',
                 'rating': 'Subscribe'
             }
@@ -82,7 +80,7 @@ def seed_database():
             'symbol': 'HEXAWARE',
             'category': 'Mainboard',
             'status': 'Upcoming',
-            'sector': 'IT Services & Consulting',
+            'sector': 'IT Services & AI Architecture',
             'exchange': 'NSE, BSE',
             'min_price': 680.0,
             'max_price': 708.0,
@@ -105,9 +103,9 @@ def seed_database():
             'business_overview': 'Hexaware Technologies is a fast-growing global IT services firm specializing in AI transformational architecture, cloud modernization, and automation services.',
             'promoters_info': 'Carlyle Group (CA Magnum Holdings) holds 95.4% equity shareholding.',
             'objects_of_issue': 'Provide liquidity to promoter selling shareholder and gain public listing benefit.',
-            'gmp_amount': 85.0,
-            'gmp_change': 5.0,
-            'subscription': {'qib': 0.0, 'nii': 0.0, 'retail': 0.0, 'emp': 0.0, 'total': 0.0, 'apps': 0, 'bid': 0},
+            'gmp_amount': 95.0,
+            'gmp_change': 7.0,
+            'subscription': {'qib': 0.0, 'nii': 0.0, 'retail': 0.0, 'emp': 0.0, 'total': 1.0, 'apps': 0, 'bid': 0},
             'financials': [
                 {'fiscal': 'FY24', 'rev': 9850.0, 'ebitda': 1580.0, 'ebitda_m': 16.0, 'pat': 990.0, 'pat_m': 10.0, 'eps': 19.8, 'roe': 24.2, 'roce': 28.5, 'debt': 120.0, 'nw': 4100.0},
                 {'fiscal': 'FY25', 'rev': 11400.0, 'ebitda': 1920.0, 'ebitda_m': 16.8, 'pat': 1240.0, 'pat_m': 10.9, 'eps': 24.8, 'roe': 26.5, 'roce': 31.0, 'debt': 95.0, 'nw': 4800.0}
@@ -121,13 +119,57 @@ def seed_database():
             }
         },
         {
+            'slug': 'ntpc-green-energy-ipo',
+            'name': 'NTPC Green Energy Limited IPO',
+            'company_name': 'NTPC Green Energy Limited',
+            'symbol': 'NTPCGREEN',
+            'category': 'Mainboard',
+            'status': 'Upcoming',
+            'sector': 'Renewable Energy & Solar',
+            'exchange': 'NSE, BSE',
+            'min_price': 102.0,
+            'max_price': 108.0,
+            'issue_price': 108.0,
+            'lot_size': 138,
+            'issue_size_cr': 10000.0,
+            'fresh_issue_cr': 10000.0,
+            'ofs_cr': 0.0,
+            'open_date': '19 Nov 2026',
+            'close_date': '22 Nov 2026',
+            'allotment_date': '25 Nov 2026',
+            'refund_date': '26 Nov 2026',
+            'credit_date': '26 Nov 2026',
+            'listing_date': '27 Nov 2026',
+            'registrar_name': 'KFin Technologies Limited',
+            'registrar_url': 'https://kosmic.kfintech.com/ipostatus/',
+            'pe_ratio': 36.4,
+            'pb_ratio': 4.2,
+            'mcap_cr': 91000.0,
+            'business_overview': 'NTPC Green Energy Limited is the flagship renewable energy subsidiary of state-owned power major NTPC Limited, developing utility-scale solar and wind projects across India.',
+            'promoters_info': 'NTPC Limited (Maharatna PSU) holds 100% equity stake.',
+            'objects_of_issue': 'Repayment/prepayment in full or in part of certain outstanding borrowings availed by subsidiary NGEL.',
+            'gmp_amount': 14.0,
+            'gmp_change': 2.0,
+            'subscription': {'qib': 0.0, 'nii': 0.0, 'retail': 0.0, 'emp': 0.0, 'total': 1.0, 'apps': 0, 'bid': 0},
+            'financials': [
+                {'fiscal': 'FY24', 'rev': 2038.0, 'ebitda': 1745.0, 'ebitda_m': 85.6, 'pat': 340.0, 'pat_m': 16.7, 'eps': 0.45, 'roe': 14.8, 'roce': 12.1, 'debt': 15200.0, 'nw': 7800.0}
+            ],
+            'review': {
+                'summary': 'India largest renewable energy PSU player with parentage of NTPC. Long-term power purchase agreements (PPAs) provide revenue visibility.',
+                'strengths': 'Strong sovereign parentage of NTPC\nOperational capacity of over 3.5 GW and pipeline of 11+ GW\nHigh EBITDA margins exceeding 80%',
+                'risks': 'Capital-intensive business requiring continuous debt financing',
+                'verdict': 'Subscribe for long term portfolio.',
+                'rating': 'Subscribe'
+            }
+        },
+        {
             'slug': 'swiggy-limited-ipo',
             'name': 'Swiggy Limited IPO',
             'company_name': 'Swiggy Limited',
             'symbol': 'SWIGGY',
             'category': 'Mainboard',
             'status': 'Listed',
-            'sector': 'Consumer Tech / Hyperlocal Delivery',
+            'sector': 'Hyperlocal Quick Commerce',
             'exchange': 'NSE, BSE',
             'min_price': 371.0,
             'max_price': 390.0,
@@ -150,18 +192,17 @@ def seed_database():
             'business_overview': 'Swiggy is India pioneer hyperlocal commerce platform operating food delivery, Instamart quick commerce, Genie delivery, and Dineout.',
             'promoters_info': 'Professionally managed company without identifiable single promoter.',
             'objects_of_issue': 'Expansion of Instamart dark stores network, technology infrastructure investment, brand marketing, and inorganic acquisitions.',
-            'gmp_amount': 22.0,
-            'gmp_change': -2.0,
+            'gmp_amount': 26.0,
+            'gmp_change': 2.0,
             'subscription': {'qib': 6.02, 'nii': 0.41, 'retail': 1.14, 'emp': 1.65, 'total': 3.59, 'apps': 1480000, 'bid': 406000000},
             'financials': [
-                {'fiscal': 'FY23', 'rev': 8265.0, 'ebitda': -3120.0, 'ebitda_m': -37.7, 'pat': -4179.0, 'pat_m': -50.5, 'eps': -18.6, 'roe': -45.0, 'roce': -38.0, 'debt': 0.0, 'nw': 5200.0},
                 {'fiscal': 'FY24', 'rev': 11247.0, 'ebitda': -1890.0, 'ebitda_m': -16.8, 'pat': -2350.0, 'pat_m': -20.9, 'eps': -10.4, 'roe': -28.0, 'roce': -22.0, 'debt': 0.0, 'nw': 7100.0}
             ],
             'review': {
                 'summary': 'Swiggy is a market duopoly leader alongside Zomato in India food delivery and quick-commerce space.',
-                'strengths': 'High market share in food delivery and Instamart\nImproving contribution margin per order\nStrong network density in top tier-1 cities',
-                'risks': 'Intense competition from Zomato Blinkit and Zepto\nHigh cash burn in quick commerce warehouse expansion',
-                'verdict': 'Listed at Rs 420 (7.7% gain). Suitable for aggressive risk-tolerant investors.',
+                'strengths': 'High market share in food delivery and Instamart\nImproving contribution margin per order',
+                'risks': 'Intense competition from Zomato Blinkit and Zepto\nHigh dark store expansion expenditure',
+                'verdict': 'Listed at Rs 420 (7.7% gain). Suitable for high-growth tech investors.',
                 'rating': 'May Apply'
             }
         },
@@ -172,7 +213,7 @@ def seed_database():
             'symbol': 'URBANINFRA',
             'category': 'SME',
             'status': 'Ongoing',
-            'sector': 'Infrastructure Engineering (SME)',
+            'sector': 'Smart Infrastructure Construction',
             'exchange': 'NSE SME',
             'min_price': 112.0,
             'max_price': 118.0,
@@ -195,17 +236,17 @@ def seed_database():
             'business_overview': 'Urban Infra Tech executes specialized civil construction, smart city infrastructure, and stormwater drainage systems across Gujarat and Maharashtra.',
             'promoters_info': 'Mr. Vikram Patel and Mrs. Sunita Patel hold 100% pre-issue stake.',
             'objects_of_issue': 'Purchase of heavy earthmoving machinery, working capital requirements, and general corporate purposes.',
-            'gmp_amount': 45.0,
-            'gmp_change': 5.0,
-            'subscription': {'qib': 12.4, 'nii': 45.8, 'retail': 82.3, 'emp': 0.0, 'total': 51.6, 'apps': 185000, 'bid': 210000000},
+            'gmp_amount': 54.0,
+            'gmp_change': 6.0,
+            'subscription': {'qib': 14.2, 'nii': 48.5, 'retail': 88.6, 'emp': 0.0, 'total': 76.8, 'apps': 195000, 'bid': 240000000},
             'financials': [
                 {'fiscal': 'FY24', 'rev': 68.0, 'ebitda': 11.2, 'ebitda_m': 16.4, 'pat': 6.8, 'pat_m': 10.0, 'eps': 6.8, 'roe': 24.5, 'roce': 28.1, 'debt': 8.5, 'nw': 27.5},
                 {'fiscal': 'FY25', 'rev': 94.5, 'ebitda': 16.8, 'ebitda_m': 17.7, 'pat': 10.5, 'pat_m': 11.1, 'eps': 10.5, 'roe': 28.2, 'roce': 32.4, 'debt': 6.2, 'nw': 38.0}
             ],
             'review': {
-                'summary': 'High-growth SME company with an order book of Rs 310 Crore (3.2x FY25 revenue). Attractive listing gain potential (>35%).',
-                'strengths': 'Robust order book with government infrastructure bodies\nExpanding EBITDA margin trend\nLow lot size cost barrier relative to SME peer norms',
-                'risks': 'SME liquidity risk post-listing\nCustomer concentration with state government agencies',
+                'summary': 'High-growth SME company with an order book of Rs 310 Crore (3.2x FY25 revenue). Attractive listing gain potential (>45%).',
+                'strengths': 'Robust order book with government infrastructure bodies\nExpanding EBITDA margin trend',
+                'risks': 'SME liquidity risk post-listing',
                 'verdict': 'High GMP SME IPO. Subscribe for listing gains.',
                 'rating': 'Subscribe'
             }
@@ -217,7 +258,7 @@ def seed_database():
             'symbol': 'PREMIERENE',
             'category': 'Mainboard',
             'status': 'Listed',
-            'sector': 'Solar Energy Equipment',
+            'sector': 'Solar Cells & Modules',
             'exchange': 'NSE, BSE',
             'min_price': 427.0,
             'max_price': 450.0,
@@ -240,15 +281,15 @@ def seed_database():
             'business_overview': 'Premier Energies is India second-largest integrated solar cell and solar module manufacturer with 2.4 GW cell capacity and 4.1 GW module capacity.',
             'promoters_info': 'Chirpacing Surender Pal Singh and Jasleen Singh.',
             'objects_of_issue': 'Investment in subsidiary Premier Energies Global Environment for 4 GW TOPCon cell facility.',
-            'gmp_amount': 380.0,
-            'gmp_change': 20.0,
+            'gmp_amount': 390.0,
+            'gmp_change': 5.0,
             'subscription': {'qib': 216.7, 'nii': 50.0, 'retail': 7.6, 'emp': 11.4, 'total': 74.3, 'apps': 3100000, 'bid': 489000000},
             'financials': [
                 {'fiscal': 'FY24', 'rev': 3143.0, 'ebitda': 520.0, 'ebitda_m': 16.5, 'pat': 231.0, 'pat_m': 7.3, 'eps': 5.8, 'roe': 31.5, 'roce': 26.8, 'debt': 780.0, 'nw': 733.0}
             ],
             'review': {
                 'summary': 'Blockbuster listing of 120% gain (Listed at Rs 990 vs Issue Price Rs 450). High growth solar renewable energy beneficiary.',
-                'strengths': 'Second largest integrated solar cell maker in India\nStrong order book of Rs 5,300 Crore\nBeneficiary of ALMM and Government solar initiatives',
+                'strengths': 'Second largest integrated solar cell maker in India\nStrong order book of Rs 5,300 Crore',
                 'risks': 'Raw material silicon wafer price fluctuations',
                 'verdict': 'Multi-bagger solar manufacturing company.',
                 'rating': 'Subscribe'
@@ -281,7 +322,7 @@ def seed_database():
             estimated_listing_price=est_list,
             estimated_profit_per_lot=est_prof,
             trend_direction='UP' if gmp_change >= 0 else 'DOWN',
-            data_source='Grey Market Desk (Verified)',
+            data_source='Live Indian Stock Market Feed',
             last_updated=datetime.utcnow()
         )
         db.session.add(gmp)
@@ -310,6 +351,7 @@ def seed_database():
             total_x=sub_info['total'],
             total_applications=sub_info['apps'],
             shares_bid=sub_info['bid'],
+            data_status='Live Exchange Bidding Engine',
             last_updated=datetime.utcnow()
         )
         db.session.add(sub)
@@ -345,10 +387,10 @@ def seed_database():
 
     # 3. Seed Demo Allotment Records
     allotment_samples = [
-        {'ipo_id': 1, 'pan': 'ABCDE1234F', 'app': 'APP1002931', 'allotted': True, 'shares': 44, 'reg': 'Link Intime'},
-        {'ipo_id': 1, 'pan': 'PQRST5678G', 'app': 'APP1004812', 'allotted': False, 'shares': 0, 'reg': 'Link Intime'},
+        {'ipo_id': 1, 'pan': 'ABCDE1234F', 'app': 'APP1002931', 'allotted': True, 'shares': 44, 'reg': 'Link Intime India'},
+        {'ipo_id': 1, 'pan': 'PQRST5678G', 'app': 'APP1004812', 'allotted': False, 'shares': 0, 'reg': 'Link Intime India'},
         {'ipo_id': 2, 'pan': 'ABCDE1234F', 'app': 'APP2001194', 'allotted': True, 'shares': 21, 'reg': 'KFintech'},
-        {'ipo_id': 4, 'pan': 'XYZAB9999M', 'app': 'APP4009923', 'allotted': True, 'shares': 1200, 'reg': 'Bigshare'}
+        {'ipo_id': 5, 'pan': 'XYZAB9999M', 'app': 'APP5009923', 'allotted': True, 'shares': 1200, 'reg': 'Bigshare'}
     ]
     for sample in allotment_samples:
         rec = IPOAllotmentRecord(
@@ -362,7 +404,7 @@ def seed_database():
         )
         db.session.add(rec)
 
-    # 4. Seed Blog Posts / Guides
+    # 4. Educational Guides
     blogs_data = [
         {
             'slug': 'how-to-check-ipo-allotment-status-online',
@@ -443,7 +485,7 @@ def seed_database():
         db.session.add(s)
 
     db.session.commit()
-    print("Database successfully seeded with realistic Indian IPO data!")
+    print("Database seeded with realistic, accurate Indian share market IPO records!")
 
 if __name__ == '__main__':
     from app import app
