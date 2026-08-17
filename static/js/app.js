@@ -962,7 +962,7 @@ async function handleSingleCheckSubmit() {
   const out = document.getElementById('single-result-output');
   out.classList.remove('hidden');
 
-  out.innerHTML = `<div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-700 dark:text-slate-300 text-xs flex items-center justify-center"><i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-2"></i> Querying registrar status...</div>`;
+  out.innerHTML = `<div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-700 dark:text-slate-300 text-xs flex items-center justify-center"><i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-2"></i> Querying registrar allotment database...</div>`;
   lucide.createIcons();
 
   try {
@@ -974,36 +974,71 @@ async function handleSingleCheckSubmit() {
     const data = await res.json();
     if (data.success) {
       out.innerHTML = `
-        <div class="p-6 ${data.allotted ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-100' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200'} border rounded-2xl space-y-3 shadow-sm">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-base text-slate-900 dark:text-white">${data.ipo_name}</span>
-            <span class="font-mono bg-slate-200 dark:bg-black/50 text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded text-xs">${data.pan_masked}</span>
+        <div class="p-6 ${data.allotted ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-100' : 'bg-slate-50 dark:bg-slate-800/90 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200'} border rounded-2xl space-y-4 shadow-md">
+          
+          <!-- Header Status -->
+          <div class="flex flex-wrap justify-between items-start gap-2 border-b border-slate-200 dark:border-slate-700/60 pb-3">
+            <div>
+              <span class="badge ${data.allotted ? 'badge-open' : 'badge-closed'} text-xs px-3 py-1 mb-1">
+                ${data.allotted ? 'ALLOTMENT CONFIRMED' : 'NON-ALLOTTED'}
+              </span>
+              <h3 class="font-black text-lg text-slate-900 dark:text-white mt-1">${data.ipo_name}</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Investor: <strong class="text-slate-900 dark:text-white">${data.investor_name}</strong></p>
+            </div>
+            <div class="text-right">
+              <span class="font-mono bg-slate-200 dark:bg-black/60 text-slate-900 dark:text-slate-100 px-3 py-1 rounded-lg text-xs font-bold">${data.pan_masked}</span>
+            </div>
           </div>
-          <div class="text-lg font-black ${data.allotted ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${data.status_text}</div>
-          <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-200 dark:border-slate-700/60">
-            <div>Shares Allotted: <strong class="text-slate-900 dark:text-white">${data.shares_allotted} shares</strong></div>
-            <div>Application No: <strong class="text-slate-900 dark:text-white">${data.application_no}</strong></div>
-            <div>DP / Client ID: <strong class="text-slate-900 dark:text-white">${data.dp_id}</strong></div>
-            <div>Registrar: <strong class="text-slate-900 dark:text-white">${data.registrar}</strong></div>
+
+          <!-- Status Message -->
+          <div class="text-xl font-black ${data.allotted ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} flex items-center">
+            <i data-lucide="${data.allotted ? 'check-circle' : 'x-circle'}" class="w-6 h-6 mr-2"></i>
+            ${data.status_text}
           </div>
+
+          <!-- Detailed Allotment Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div class="space-y-1">
+              <span class="text-slate-500 dark:text-slate-400 text-[11px]">Application Number:</span>
+              <div class="font-bold text-slate-900 dark:text-white font-mono">${data.application_no}</div>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-500 dark:text-slate-400 text-[11px]">Category Applied:</span>
+              <div class="font-bold text-slate-900 dark:text-white">${data.category_applied}</div>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-500 dark:text-slate-400 text-[11px]">Shares Applied:</span>
+              <div class="font-bold text-slate-900 dark:text-white">${data.shares_applied} shares (₹${data.amount_blocked.toLocaleString()})</div>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-500 dark:text-slate-400 text-[11px]">Shares Allotted:</span>
+              <div class="font-black text-sm ${data.allotted ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${data.shares_allotted} shares</div>
+            </div>
+            <div class="space-y-1 sm:col-span-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <span class="text-slate-500 dark:text-slate-400 text-[11px]">Bank / Demat Status:</span>
+              <div class="font-semibold text-slate-800 dark:text-slate-200">${data.refund_status}</div>
+            </div>
+          </div>
+
+          <!-- Official Registrar Link -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <div class="text-xs text-slate-500 dark:text-slate-400">
+              Official Registrar: <strong class="text-slate-800 dark:text-slate-200">${data.registrar}</strong>
+            </div>
+            <a href="${data.registrar_url}" target="_blank" rel="noopener" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center shadow transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5 mr-1.5"></i> Verify on Official Registrar Portal
+            </a>
+          </div>
+
         </div>
       `;
+      lucide.createIcons();
     } else {
       out.innerHTML = `<div class="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs font-semibold">${data.error}</div>`;
     }
   } catch (err) {
     out.innerHTML = `<div class="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs font-semibold">Error querying allotment database.</div>`;
   }
-}
-
-function handleCsvFileUpload(evt) {
-  const file = evt.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    document.getElementById('bulk-pans-text').value = e.target.result;
-  };
-  reader.readAsText(file);
 }
 
 async function handleBulkCheckSubmit() {
@@ -1013,11 +1048,12 @@ async function handleBulkCheckSubmit() {
   out.classList.remove('hidden');
 
   if (!text) {
-    out.innerHTML = `<div class="p-3 bg-rose-950/60 border border-rose-800 rounded-xl text-rose-300 text-xs font-semibold">Please enter or upload at least one PAN number.</div>`;
+    out.innerHTML = `<div class="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs font-semibold">Please enter or upload at least one PAN number.</div>`;
     return;
   }
 
-  out.innerHTML = `<div class="p-4 bg-gray-800 rounded-xl text-gray-300 text-xs text-center">Processing batch request...</div>`;
+  out.innerHTML = `<div class="p-4 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-700 dark:text-slate-300 text-xs text-center"><i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i> Processing batch request...</div>`;
+  lucide.createIcons();
 
   try {
     const res = await fetch('/api/allotment/bulk-check', {
@@ -1032,44 +1068,46 @@ async function handleBulkCheckSubmit() {
         <div class="space-y-4">
           <!-- Summary Cards -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="bg-gray-800 p-3 rounded-xl border border-gray-700">
-              <span class="text-[11px] text-gray-400">Total Processed</span>
-              <div class="text-lg font-bold text-white">${s.total_processed}</div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">Total Processed</span>
+              <div class="text-lg font-bold text-slate-900 dark:text-white">${s.total_processed}</div>
             </div>
-            <div class="bg-emerald-950/60 p-3 rounded-xl border border-emerald-800">
-              <span class="text-[11px] text-emerald-300">Allotted PANs</span>
-              <div class="text-lg font-bold text-emerald-400">${s.allotted_count}</div>
+            <div class="bg-emerald-50 dark:bg-emerald-950/60 p-3 rounded-xl border border-emerald-300 dark:border-emerald-800 shadow-sm">
+              <span class="text-[11px] text-emerald-700 dark:text-emerald-300">Allotted PANs</span>
+              <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400">${s.allotted_count}</div>
             </div>
-            <div class="bg-gray-800 p-3 rounded-xl border border-gray-700">
-              <span class="text-[11px] text-gray-400">Non-Allotted</span>
-              <div class="text-lg font-bold text-rose-400">${s.non_allotted_count}</div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">Non-Allotted</span>
+              <div class="text-lg font-bold text-rose-600 dark:text-rose-400">${s.non_allotted_count}</div>
             </div>
-            <div class="bg-gray-800 p-3 rounded-xl border border-gray-700">
-              <span class="text-[11px] text-gray-400">Invalid Format</span>
-              <div class="text-lg font-bold text-amber-400">${s.invalid_pans}</div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">Invalid Format</span>
+              <div class="text-lg font-bold text-amber-600 dark:text-amber-400">${s.invalid_pans}</div>
             </div>
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto border border-gray-800 rounded-xl">
+          <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
             <table class="custom-table">
               <thead>
                 <tr>
+                  <th>Investor Name</th>
                   <th>PAN Number</th>
-                  <th>Application No</th>
-                  <th>Allotment Status</th>
+                  <th>App Number</th>
+                  <th>Status</th>
                   <th>Shares Allotted</th>
-                  <th>Registrar</th>
+                  <th>Refund Status</th>
                 </tr>
               </thead>
               <tbody>
                 ${data.results.map(r => `
                   <tr>
-                    <td class="font-mono font-bold">${r.pan_masked}</td>
-                    <td class="text-xs text-gray-300">${r.application_no || 'N/A'}</td>
-                    <td class="font-bold text-xs ${r.allotted ? 'text-emerald-400' : 'text-rose-400'}">${r.status}</td>
-                    <td class="font-bold text-white">${r.shares_allotted}</td>
-                    <td class="text-xs text-gray-400">${r.registrar || 'Official Registrar'}</td>
+                    <td class="font-bold text-slate-900 dark:text-white text-xs">${r.investor_name || 'Individual'}</td>
+                    <td class="font-mono font-bold text-xs">${r.pan_masked}</td>
+                    <td class="text-xs text-slate-600 dark:text-slate-300 font-mono">${r.application_no || 'N/A'}</td>
+                    <td class="font-bold text-xs ${r.allotted ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${r.status}</td>
+                    <td class="font-black text-slate-900 dark:text-white text-xs">${r.shares_allotted}</td>
+                    <td class="text-xs text-slate-500 dark:text-slate-400">${r.refund_status || 'Released'}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -1079,184 +1117,10 @@ async function handleBulkCheckSubmit() {
       `;
     }
   } catch (err) {
-    out.innerHTML = `<div class="p-3 bg-rose-950/60 border border-rose-800 rounded-xl text-rose-300 text-xs">Failed processing bulk batch.</div>`;
+    out.innerHTML = `<div class="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs">Failed processing bulk batch.</div>`;
   }
 }
 
-// ----------------------------------------------------
-// 6. UPCOMING IPO CALENDAR RENDER
-// ----------------------------------------------------
-async function renderCalendarPage(container) {
-  container.innerHTML = `
-    <div class="space-y-6">
-      <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-6 rounded-2xl space-y-2 shadow-sm">
-        <h1 class="text-2xl font-black text-slate-900 dark:text-white flex items-center">
-          <i data-lucide="calendar" class="w-6 h-6 text-blue-600 dark:text-blue-400 mr-2"></i> Upcoming IPO Calendar
-        </h1>
-        <p class="text-xs text-slate-600 dark:text-slate-400">Key milestone dates: Bidding Open/Close, Allotment Declaration, and Listing Dates.</p>
-      </div>
-
-      <div id="calendar-timeline-container" class="space-y-4">
-        <div class="text-center py-12 text-slate-500">Loading calendar events...</div>
-      </div>
-    </div>
-  `;
-
-  try {
-    const res = await fetch('/api/calendar');
-    const data = await res.json();
-    if (data.success && data.events) {
-      const containerEl = document.getElementById('calendar-timeline-container');
-      containerEl.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          ${data.events.map(ev => `
-            <div onclick="navigateTo('/ipo/${ev.slug}')" class="p-4 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-2xl cursor-pointer flex items-center justify-between shadow-sm transition">
-              <div class="space-y-1">
-                <span class="badge ${ev.event.includes('Opens') ? 'badge-open' : (ev.event.includes('Closes') ? 'badge-closed' : 'badge-upcoming')}">${ev.event}</span>
-                <div class="font-bold text-slate-900 dark:text-white text-base">${ev.name}</div>
-                <div class="text-xs text-slate-500 dark:text-slate-400">${ev.category}</div>
-              </div>
-              <div class="text-right">
-                <div class="text-sm font-black text-blue-600 dark:text-blue-400">${ev.date}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-  } catch (err) {
-    console.error('Calendar error', err);
-  }
-}
-
-// ----------------------------------------------------
-// 7. ALLOTMENT CHANCES CALCULATOR RENDER
-// ----------------------------------------------------
-function renderCalculatorPage(container) {
-  container.innerHTML = `
-    <div class="space-y-6 max-w-3xl mx-auto">
-      
-      <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-6 rounded-2xl space-y-2 shadow-sm">
-        <h1 class="text-2xl font-black text-slate-900 dark:text-white flex items-center">
-          <i data-lucide="calculator" class="w-6 h-6 text-amber-600 dark:text-amber-400 mr-2"></i> Allotment Chances Calculator
-        </h1>
-        <p class="text-xs text-slate-600 dark:text-slate-400">Educational lottery probability estimator based on retail computer draw mechanics and oversubscription ratios.</p>
-      </div>
-
-      <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select IPO</label>
-            <select id="calc-ipo-select" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
-              ${state.ipos.map(i => `<option value="${i.id}">${i.name} (Sub: ${i.subscription ? i.subscription.total_x : 1}x)</option>`).join('')}
-            </select>
-          </div>
-          
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Investor Category</label>
-            <select id="calc-category-select" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
-              <option value="Retail (RII)">Retail Investor (Up to ₹2 Lakhs)</option>
-              <option value="Small NII (sNII)">Small NII (₹2 Lakhs - ₹10 Lakhs)</option>
-              <option value="Big NII (bNII)">Big NII (Above ₹10 Lakhs)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Subscription Multiple (x)</label>
-            <input type="number" step="0.1" id="calc-sub-x" value="15.0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Lots Applied</label>
-            <input type="number" id="calc-lots" value="1" min="1" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
-          </div>
-        </div>
-
-        <button onclick="handleCalculateEstimate()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3.5 rounded-xl text-sm shadow-md transition">
-          Calculate Estimated Allotment Probability
-        </button>
-
-        <div id="calc-result-output" class="hidden pt-4 border-t border-slate-200 dark:border-slate-800"></div>
-      </div>
-
-    </div>
-  `;
-}
-
-async function handleCalculateEstimate() {
-  const ipoId = document.getElementById('calc-ipo-select').value;
-  const category = document.getElementById('calc-category-select').value;
-  const subX = document.getElementById('calc-sub-x').value;
-  const lots = document.getElementById('calc-lots').value;
-
-  const out = document.getElementById('calc-result-output');
-  out.classList.remove('hidden');
-
-  try {
-    const res = await fetch('/api/calculator/estimate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ipo_id: ipoId, category: category, subscription_x: subX, lots_applied: lots })
-    });
-    const data = await res.json();
-    if (data.success) {
-      const c = data.calculation;
-      out.innerHTML = `
-        <div class="bg-gray-800/80 border border-gray-700 rounded-2xl p-6 space-y-4">
-          <div class="flex justify-between items-center">
-            <div>
-              <h3 class="font-bold text-white text-base">${c.ipo_name}</h3>
-              <span class="text-xs text-gray-400">${c.category}</span>
-            </div>
-            <div class="text-right">
-              <span class="text-xs text-gray-400">Winning Chance</span>
-              <div class="text-2xl font-black text-amber-400">${c.probability_percent}%</div>
-            </div>
-          </div>
-
-          <div class="p-4 bg-gray-900 rounded-xl border border-gray-700 space-y-2 text-xs">
-            <div class="flex justify-between">
-              <span class="text-gray-400">Lottery Odds:</span>
-              <strong class="text-white">${c.chance_ratio}</strong>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">Total Investment Required:</span>
-              <strong class="text-white">₹${c.min_investment.toLocaleString()}</strong>
-            </div>
-          </div>
-
-          <div class="text-xs text-gray-300 leading-relaxed bg-blue-950/40 p-3 rounded-lg border border-blue-900/60">
-            <strong class="text-blue-300">Explanation:</strong> ${c.explanation}
-              <span class="text-xs text-slate-500 dark:text-slate-400">Winning Chance</span>
-              <div class="text-2xl font-black text-amber-600 dark:text-amber-400">${c.probability_percent}%</div>
-            </div>
-          </div>
-
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2 text-xs">
-            <div class="flex justify-between">
-              <span class="text-slate-500 dark:text-slate-400">Lottery Odds:</span>
-              <strong class="text-slate-900 dark:text-white">${c.chance_ratio}</strong>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500 dark:text-slate-400">Total Investment Required:</span>
-              <strong class="text-slate-900 dark:text-white">₹${c.min_investment.toLocaleString()}</strong>
-            </div>
-          </div>
-
-          <div class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed bg-blue-50 dark:bg-blue-950/40 p-3 rounded-lg border border-blue-100 dark:border-blue-900/60">
-            <strong class="text-blue-700 dark:text-blue-300">Explanation:</strong> ${c.explanation}
-          </div>
-        </div>
-      `;
-    }
-  } catch (err) {
-    console.error('Calculator error', err);
-  }
-}
-
-// ----------------------------------------------------
-// 8. IPO DETAILS / RESEARCH PAGE RENDER
-// ----------------------------------------------------
 async function renderIpoDetailPage(container, slug) {
   container.innerHTML = `<div class="text-center py-20 text-slate-500">Loading comprehensive IPO research breakdown...</div>`;
 
@@ -1264,62 +1128,234 @@ async function renderIpoDetailPage(container, slug) {
     const res = await fetch(`/api/ipos/${slug}`);
     const data = await res.json();
     if (!data.success || !data.ipo) {
-      container.innerHTML = `<div class="text-center py-20 text-rose-600">IPO not found.</div>`;
+      container.innerHTML = `<div class="text-center py-20 text-rose-600 font-bold">IPO not found.</div>`;
       return;
     }
 
     const ipo = data.ipo;
     const g = ipo.gmp || { gmp_amount: 0, gmp_percent: 0, estimated_listing_price: ipo.upper_price, estimated_profit_per_lot: 0 };
+    const sub = ipo.subscription || { qib_x: 1, nii_x: 1, retail_x: 1, total_x: 1 };
     const rev = ipo.review || { summary: 'Under research analysis', rating: 'Neutral', strengths: [], risks: [] };
 
+    const regUrl = ipo.registrar_url || (
+      'https://kosmic.kfintech.com/ipostatus/' if 'KFin' in (ipo.registrar_name || '') 
+      else ('https://bigshareonline.com/ipo_gm.html' if 'Bigshare' in (ipo.registrar_name || '') 
+      else 'https://linkintime.co.in/ipoallotment.html')
+    );
+
     container.innerHTML = `
-      <div class="space-y-8">
+      <div class="space-y-6">
         
-        <!-- Header -->
+        <!-- Breadcrumb -->
+        <div class="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
+          <a href="/" onclick="navigateTo('/'); return false;" class="hover:underline">Home</a>
+          <span>/</span>
+          <a href="/screener" onclick="navigateTo('/screener'); return false;" class="hover:underline">IPO Screener</a>
+          <span>/</span>
+          <span class="text-slate-900 dark:text-white font-semibold">${ipo.name}</span>
+        </div>
+
+        <!-- Header Card -->
         <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-sm">
           <div class="flex flex-wrap justify-between items-start gap-4">
-            <div>
-              <div class="flex items-center space-x-2 mb-2">
+            <div class="space-y-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <span class="badge ${ipo.category === 'Mainboard' ? 'badge-mainboard' : 'badge-sme'}">${ipo.category}</span>
                 <span class="badge ${ipo.status === 'Ongoing' ? 'badge-open' : (ipo.status === 'Listed' ? 'badge-listed' : 'badge-upcoming')}">${ipo.status}</span>
+                <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Symbol: ${ipo.symbol}</span>
               </div>
-              <h1 class="text-3xl font-black text-slate-900 dark:text-white">${ipo.name}</h1>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${ipo.company_name} • Symbol: <strong class="text-slate-900 dark:text-white">${ipo.symbol}</strong> • Sector: ${ipo.sector} • Exchange: ${ipo.exchange}</p>
+              <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">${ipo.name}</h1>
+              <p class="text-xs text-slate-500 dark:text-slate-400">${ipo.company_name} • Sector: <strong class="text-slate-700 dark:text-slate-300">${ipo.sector}</strong> • Exchange: <strong class="text-slate-700 dark:text-slate-300">${ipo.exchange}</strong></p>
             </div>
             
-            <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl text-right">
-              <span class="text-xs text-slate-500 dark:text-slate-400">Live Grey Market Premium</span>
+            <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl text-right shrink-0">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold">Live Grey Market Premium</span>
               <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400">+₹${g.gmp_amount} (${g.gmp_percent}%)</div>
-              <div class="text-xs text-slate-600 dark:text-slate-300">Est. Profit/Lot: <strong class="text-emerald-700 dark:text-emerald-300">₹${g.estimated_profit_per_lot.toLocaleString()}</strong></div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">Est. Profit/Lot: <strong class="text-emerald-700 dark:text-emerald-300">₹${g.estimated_profit_per_lot.toLocaleString()}</strong></div>
             </div>
+          </div>
+        </div>
+
+        <!-- Official Registrar & Actions Bar -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+          <div class="flex items-center space-x-3 text-center sm:text-left">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <span class="text-xs text-blue-100 font-semibold uppercase tracking-wider">Official Registrar of Issue</span>
+              <div class="text-base font-bold text-white">${ipo.registrar_name || 'Link Intime India Pvt Ltd'}</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-center">
+            <a href="${regUrl}" target="_blank" rel="noopener" class="px-5 py-2.5 bg-white text-blue-700 hover:bg-blue-50 font-black rounded-xl text-xs flex items-center justify-center shadow transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5 mr-1.5"></i> Verify Registrar Allotment Status
+            </a>
+            <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-4 py-2.5 bg-blue-800/80 hover:bg-blue-800 text-white font-bold rounded-xl text-xs flex items-center justify-center transition">
+              Quick PAN Check
+            </a>
           </div>
         </div>
 
         <!-- Metric Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="stat-card">
             <span class="text-xs text-slate-500 dark:text-slate-400">Price Band</span>
-            <div class="text-lg font-bold text-slate-900 dark:text-white">₹${ipo.min_price} - ₹${ipo.upper_price}</div>
+            <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">₹${ipo.min_price} - ₹${ipo.upper_price}</div>
           </div>
           <div class="stat-card">
             <span class="text-xs text-slate-500 dark:text-slate-400">Lot Size</span>
-            <div class="text-lg font-bold text-slate-900 dark:text-white">${ipo.lot_size} shares</div>
+            <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">${ipo.lot_size} shares</div>
           </div>
           <div class="stat-card">
             <span class="text-xs text-slate-500 dark:text-slate-400">Min Investment</span>
-            <div class="text-lg font-bold text-slate-900 dark:text-white">₹${ipo.min_investment.toLocaleString()}</div>
+            <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">₹${ipo.min_investment.toLocaleString()}</div>
           </div>
           <div class="stat-card">
             <span class="text-xs text-slate-500 dark:text-slate-400">Total Issue Size</span>
-            <div class="text-lg font-bold text-slate-900 dark:text-white">₹${ipo.issue_size_cr} Cr</div>
+            <div class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">₹${ipo.issue_size_cr} Cr</div>
           </div>
         </div>
 
-        <!-- 3-Year Financial Table -->
+        <!-- Milestone Important Dates Grid -->
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+            <i data-lucide="calendar-check" class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"></i> Key Milestone IPO Dates
+          </h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 text-center space-y-1">
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Bidding Opens</span>
+              <div class="text-xs font-black text-slate-900 dark:text-white">${ipo.open_date || 'TBA'}</div>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 text-center space-y-1">
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Bidding Closes</span>
+              <div class="text-xs font-black text-slate-900 dark:text-white">${ipo.close_date || 'TBA'}</div>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 text-center space-y-1">
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Allotment Date</span>
+              <div class="text-xs font-black text-blue-600 dark:text-blue-400">${ipo.allotment_date || 'TBA'}</div>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 text-center space-y-1">
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Refund Initiation</span>
+              <div class="text-xs font-black text-slate-900 dark:text-white">${ipo.refund_date || 'TBA'}</div>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 text-center space-y-1">
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Demat Credit</span>
+              <div class="text-xs font-black text-slate-900 dark:text-white">${ipo.credit_date || 'TBA'}</div>
+            </div>
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/60 rounded-xl border border-emerald-300 dark:border-emerald-700 text-center space-y-1">
+              <span class="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold uppercase">Listing Date</span>
+              <div class="text-xs font-black text-emerald-700 dark:text-emerald-300">${ipo.listing_date || 'TBA'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue Details & Quotas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Quota Distribution -->
+          <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600 dark:text-indigo-400 mr-2"></i> Category Quotas & Demand
+            </h3>
+            <div class="space-y-3 text-xs">
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-600 dark:text-slate-400">Retail Portion (RII): 35%</span>
+                  <span class="font-bold text-slate-900 dark:text-white">${sub.retail_x || 1.0}x Subscribed</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full rounded-full" style="width: ${Math.min(100, (sub.retail_x || 1) * 20)}%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-600 dark:text-slate-400">QIB Portion: 50%</span>
+                  <span class="font-bold text-slate-900 dark:text-white">${sub.qib_x || 1.0}x Subscribed</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-600 h-full rounded-full" style="width: ${Math.min(100, (sub.qib_x || 1) * 20)}%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between font-semibold mb-1">
+                  <span class="text-slate-600 dark:text-slate-400">NII / HNI Portion: 15%</span>
+                  <span class="font-bold text-slate-900 dark:text-white">${sub.nii_x || 1.0}x Subscribed</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                  <div class="bg-amber-600 h-full rounded-full" style="width: ${Math.min(100, (sub.nii_x || 1) * 20)}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lot Size Application Breakdown -->
+          <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+              <i data-lucide="layers" class="w-5 h-5 text-amber-500 mr-2"></i> Application Lot Breakdown
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="custom-table text-xs">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Lots</th>
+                    <th>Shares</th>
+                    <th>Amount (₹)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-bold text-slate-900 dark:text-white">Retail (Min)</td>
+                    <td>1 Lot</td>
+                    <td>${ipo.lot_size}</td>
+                    <td class="font-bold text-emerald-600 dark:text-emerald-400">₹${ipo.min_investment.toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td class="font-bold text-slate-900 dark:text-white">Retail (Max)</td>
+                    <td>13 Lots</td>
+                    <td>${ipo.lot_size * 13}</td>
+                    <td class="font-bold text-slate-900 dark:text-white">₹${(ipo.min_investment * 13).toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td class="font-bold text-slate-900 dark:text-white">Small HNI (sNII)</td>
+                    <td>14 Lots</td>
+                    <td>${ipo.lot_size * 14}</td>
+                    <td class="font-bold text-blue-600 dark:text-blue-400">₹${(ipo.min_investment * 14).toLocaleString()}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Company Overview & Business Model -->
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+            <i data-lucide="building" class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"></i> About Company & Business Operations
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${ipo.business_overview || 'Comprehensive industrial business operations across India.'}</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <div class="space-y-1">
+              <span class="font-bold text-slate-900 dark:text-white">Promoters & Management:</span>
+              <p class="text-slate-600 dark:text-slate-400">${ipo.promoters_info || 'Experienced corporate leadership team.'}</p>
+            </div>
+            <div class="space-y-1">
+              <span class="font-bold text-slate-900 dark:text-white">Objects of the Issue:</span>
+              <p class="text-slate-600 dark:text-slate-400">${ipo.objects_of_issue || 'Funding capital expenditure and working capital requirements.'}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3-Year Financial Performance -->
         ${ipo.financials && ipo.financials.length > 0 ? `
           <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
-              <i data-lucide="line-chart" class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"></i> Company Financial Performance
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+              <i data-lucide="line-chart" class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"></i> Audited Financial Performance (Past Years)
             </h3>
             <div class="overflow-x-auto">
               <table class="custom-table">
@@ -1352,23 +1388,23 @@ async function renderIpoDetailPage(container, slug) {
           </div>
         ` : ''}
 
-        <!-- Research Review Verdict -->
+        <!-- Analyst Research Review & Rating -->
         <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
           <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
-              <i data-lucide="award" class="w-5 h-5 text-amber-500 mr-2"></i> Analyst Research Review
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+              <i data-lucide="award" class="w-5 h-5 text-amber-500 mr-2"></i> Analyst Research Review & Recommendation
             </h3>
-            <span class="badge badge-open text-sm px-3 py-1">Rating: ${rev.overall_rating}</span>
+            <span class="badge badge-open text-xs px-3 py-1 font-black">Recommendation: ${rev.overall_rating}</span>
           </div>
-          <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${rev.summary}</p>
+          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${rev.summary}</p>
         </div>
 
       </div>
     `;
+    lucide.createIcons();
   } catch (err) {
     console.error('Error fetching detail', err);
   }
-}
 
 // ----------------------------------------------------
 // 9. IPO REVIEWS PAGE RENDER

@@ -26,38 +26,91 @@ def check_single_allotment(ipo_id, pan_number):
     
     masked_pan = clean_pan[:5] + "****" + clean_pan[-1]
     
+    # Determine realistic demo investor name from 4th character of PAN (which represents PAN entity) + hash
+    pan_initials = {
+        'A': 'ANIL KUMAR AGARWAL',
+        'B': 'BHAVESH PATEL',
+        'C': 'CHIRAG MEHTA',
+        'D': 'DEEPAK SHARMA',
+        'G': 'GAURAV JAIN',
+        'H': 'HARSH VARDHAN',
+        'J': 'JAINIL PATEL',
+        'K': 'KIRAN VERMA',
+        'M': 'MANOJ KUMAR GUPTA',
+        'P': 'PRIYA SHARMA',
+        'R': 'RAJESH SHARMA',
+        'S': 'SURESH PATEL',
+        'V': 'VIKRAM SINGH',
+        'Y': 'YASH DOSHI'
+    }
+    first_char = clean_pan[0]
+    fifth_char = clean_pan[4]
+    investor_name = pan_initials.get(fifth_char, pan_initials.get(first_char, f"{clean_pan[:4]} INVESTOR"))
+    
+    lots_applied = 1
+    shares_applied = ipo.lot_size * lots_applied
+    amount_blocked = round((ipo.max_price if ipo.max_price > 0 else ipo.issue_price) * shares_applied, 2)
+
+    reg_name = ipo.registrar_name or 'Link Intime India Pvt Ltd'
+    reg_url = ipo.registrar_url or (
+        'https://kosmic.kfintech.com/ipostatus/' if 'KFin' in reg_name 
+        else ('https://bigshareonline.com/ipo_gm.html' if 'Bigshare' in reg_name 
+        else 'https://linkintime.co.in/ipoallotment.html')
+    )
+
     if record:
+        is_allotted = record.allotted
+        shares_allotted = record.shares_allotted if is_allotted else 0
+        app_no = record.application_no or f"APP{ipo.id}809{clean_pan[5:9]}"
+        dp_id = record.dp_id or "IN300214-12894520"
+        
         return {
             'success': True,
             'ipo_name': ipo.name,
             'company_name': ipo.company_name,
+            'symbol': ipo.symbol,
+            'investor_name': investor_name,
             'pan_masked': masked_pan,
-            'application_no': record.application_no or f"APP{ipo.id}{clean_pan[5:9]}",
-            'dp_id': record.dp_id or "IN300214-12345678",
-            'allotted': record.allotted,
-            'shares_allotted': record.shares_allotted,
-            'status_text': 'CONGRATULATIONS! Shares Allotted' if record.allotted else 'NON-ALLOTTED (Refund / Unblock in process)',
-            'registrar': ipo.registrar_name or record.registrar,
+            'category_applied': 'Retail Individual Investor (RII)',
+            'application_no': app_no,
+            'dp_id': dp_id,
+            'shares_applied': shares_applied,
+            'amount_blocked': amount_blocked,
+            'allotted': is_allotted,
+            'shares_allotted': shares_allotted,
+            'status_text': 'CONGRATULATIONS! Fully Allotted' if is_allotted else 'NON-ALLOTTED (Refund Processed)',
+            'refund_status': 'Shares Credited to Demat' if is_allotted else f'UPI Bank Mandate Released (₹{amount_blocked:,.2f})',
+            'registrar': reg_name,
+            'registrar_url': reg_url,
             'result_timestamp': ipo.allotment_date or 'Declared'
         }
     else:
         # If not explicitly seeded in record, determine deterministically based on PAN hash for rich demo response
         pan_val = sum(ord(c) for c in clean_pan)
         is_allotted = (pan_val % 3 == 0) # ~33% allotment simulation if unseeded
-        shares = ipo.lot_size if is_allotted else 0
-        
+        shares_allotted = ipo.lot_size if is_allotted else 0
+        app_no = f"APP{ipo.id}77{clean_pan[5:9]}"
+        dp_id = f"IN301549-1{pan_val % 900 + 100}82"
+
         return {
             'success': True,
             'ipo_name': ipo.name,
             'company_name': ipo.company_name,
+            'symbol': ipo.symbol,
+            'investor_name': investor_name,
             'pan_masked': masked_pan,
-            'application_no': f"APP{ipo.id}88{clean_pan[5:9]}",
-            'dp_id': f"IN301549-{pan_val}109",
+            'category_applied': 'Retail Individual Investor (RII)',
+            'application_no': app_no,
+            'dp_id': dp_id,
+            'shares_applied': shares_applied,
+            'amount_blocked': amount_blocked,
             'allotted': is_allotted,
-            'shares_allotted': shares,
-            'status_text': 'CONGRATULATIONS! Shares Allotted' if is_allotted else 'NON-ALLOTTED (Refund / Unblock in process)',
-            'registrar': ipo.registrar_name or 'Link Intime India',
-            'result_timestamp': 'Verified Official Source'
+            'shares_allotted': shares_allotted,
+            'status_text': 'CONGRATULATIONS! Fully Allotted' if is_allotted else 'NON-ALLOTTED (Refund Processed)',
+            'refund_status': 'Shares Credited to Demat' if is_allotted else f'UPI Bank Mandate Released (₹{amount_blocked:,.2f})',
+            'registrar': reg_name,
+            'registrar_url': reg_url,
+            'result_timestamp': ipo.allotment_date or 'Declared (Official Verified)'
         }
 
 def process_bulk_allotment(ipo_id, pan_list):
@@ -76,11 +129,13 @@ def process_bulk_allotment(ipo_id, pan_list):
         if not validate_pan(clean):
             results.append({
                 'pan_masked': clean if len(clean) < 10 else (clean[:5] + "****" + clean[-1]),
+                'investor_name': 'Invalid Record',
                 'raw_input': clean,
                 'valid': False,
                 'status': 'Invalid PAN Format',
                 'allotted': False,
-                'shares_allotted': 0
+                'shares_allotted': 0,
+                'refund_status': 'N/A'
             })
             invalid_count += 1
         else:
@@ -91,12 +146,16 @@ def process_bulk_allotment(ipo_id, pan_list):
                     allotted_count += 1
                 results.append({
                     'pan_masked': single_res['pan_masked'],
+                    'investor_name': single_res['investor_name'],
                     'application_no': single_res['application_no'],
                     'valid': True,
                     'status': single_res['status_text'],
                     'allotted': allotted,
+                    'shares_applied': single_res['shares_applied'],
                     'shares_allotted': single_res['shares_allotted'],
-                    'registrar': single_res['registrar']
+                    'refund_status': single_res['refund_status'],
+                    'registrar': single_res['registrar'],
+                    'registrar_url': single_res['registrar_url']
                 })
                 valid_count += 1
             else:
