@@ -26,10 +26,28 @@ def fetch_external_url(url, timeout=10):
         logger.warning(f"Live URL fetch note [{url}]: {e}")
         return None
 
+def clean_ipo_name(raw_name):
+    """
+    Cleans up raw parsed text into professional Indian IPO format.
+    Example: 'Tata Capital Limited SME' -> 'Tata Capital Limited IPO'
+    """
+    if not raw_name:
+        return ""
+    # Strip HTML and extra whitespace
+    name = re.sub(r'<[^>]+>', '', raw_name).strip()
+    # Remove duplicate IPO suffixes
+    name = re.sub(r'\s+IPO\s+IPO', ' IPO', name, flags=re.IGNORECASE)
+    name = re.sub(r'\s*\([^)]*\)', '', name) # remove bracketed text
+    name = re.sub(r'\s*(BSE|NSE|SME|Mainboard)\s*$', '', name, flags=re.IGNORECASE).strip()
+    
+    if not name.lower().endswith('ipo'):
+        name += ' IPO'
+    return name.strip()
+
 def parse_live_market_urls():
     """
-    Tries multiple live Indian share market IPO portals (Investorgain, Chittorgarh, IPOWatch).
-    Parses live Mainboard & SME IPOs, Price Bands, GMP rates, and milestone dates.
+    Scrapes live Indian share market IPO tables (Investorgain, Chittorgarh, IPOWatch).
+    Extracts clean IPO names, Price Bands, GMP rates, and dates.
     """
     target_urls = [
         "https://www.investorgain.com/report/live-ipo-gmp/331/",
@@ -54,9 +72,9 @@ def parse_live_market_urls():
                         continue
 
                     category = 'SME' if ('SME' in raw_name or 'BSE SME' in raw_name or 'NSE SME' in raw_name) else 'Mainboard'
-                    name = re.sub(r'\s*(SME|IPO|BSE|NSE|\(.*?\))\s*', ' ', raw_name, flags=re.IGNORECASE).strip()
-                    if not name.endswith('IPO'):
-                        name += ' IPO'
+                    name = clean_ipo_name(raw_name)
+                    if len(name) < 5:
+                        continue
 
                     # Extract numbers
                     price_match = re.search(r'₹?\s*(\d+)', clean_cols[1] if len(clean_cols) > 1 else '')
@@ -67,6 +85,7 @@ def parse_live_market_urls():
 
                     items.append({
                         'name': name,
+                        'company_name': name.replace(' IPO', ''),
                         'category': category,
                         'status': 'Ongoing' if gmp_val > 0 else 'Upcoming',
                         'max_price': price_val,
@@ -83,10 +102,10 @@ def parse_live_market_urls():
 
 def parse_and_sync_live_ipos():
     """
-    Automated Daily Data Ingestion Engine.
-    Queries live market portals and updates SQLite database with real Indian Mainboard & SME IPOs every day automatically.
+    Automated Daily Data Sync Software.
+    Scrapes live portal feeds, cleans IPO names, and updates database automatically every day.
     """
-    logger.info("Running Live Data Sync for Indian Share Market (Mainboard & SME)...")
+    logger.info("Executing Live Indian Stock Market Data Sync (Clean Names & Daily GMP)...")
     
     scraped_items = parse_live_market_urls()
     market_feed = get_current_live_indian_market_feed()
@@ -103,12 +122,12 @@ def parse_and_sync_live_ipos():
     added_count = 0
 
     for item in live_items:
-        name = item.get('name', '').strip()
-        if not name or len(name) < 3:
+        name = clean_ipo_name(item.get('name', ''))
+        if not name or len(name) < 5:
             continue
 
         slug = name.lower().replace(' ', '-').replace('/', '-').replace('(', '').replace(')', '')
-        ipo = IPO.query.filter((IPO.slug == slug) | (IPO.name.ilike(f"%{name[:10]}%"))).first()
+        ipo = IPO.query.filter((IPO.slug == slug) | (IPO.name.ilike(f"%{name[:12]}%"))).first()
 
         category = item.get('category', 'Mainboard')
         status = item.get('status', 'Ongoing')
@@ -151,6 +170,7 @@ def parse_and_sync_live_ipos():
             db.session.flush()
             added_count += 1
         else:
+            ipo.name = name
             ipo.status = status
             if open_dt: ipo.open_date = open_dt
             if close_dt: ipo.close_date = close_dt
@@ -241,7 +261,7 @@ def parse_and_sync_live_ipos():
 
 def get_current_live_indian_market_feed():
     """
-    Live Indian Stock Market Feed representing active Mainboard & SME offerings today with exact key dates.
+    Live Indian Stock Market Feed representing active Mainboard & SME offerings today with exact key dates and clean names.
     """
     return [
         {
