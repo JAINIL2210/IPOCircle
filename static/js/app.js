@@ -633,8 +633,10 @@ function filterGmpTable() {
   const tbody = document.getElementById('gmp-table-body');
   if (!tbody || !window._gmpRaw) return;
 
-  const search = (document.getElementById('gmp-search-input')?.value || '').toLowerCase();
-  const category = document.getElementById('gmp-category-select')?.value || 'All';
+  const searchInputEl = document.getElementById('gmp-search-input');
+  const search = (searchInputEl ? searchInputEl.value : '').toLowerCase();
+  const categorySelectEl = document.getElementById('gmp-category-select');
+  const category = categorySelectEl ? categorySelectEl.value : 'All';
 
   const filtered = window._gmpRaw.filter(item => {
     const matchesSearch = item.ipo_name.toLowerCase().includes(search) || item.company_name.toLowerCase().includes(search);
@@ -727,10 +729,14 @@ async function renderScreenerPage(container, path = '') {
 }
 
 async function runScreenerQuery() {
-  const status = document.getElementById('screener-status')?.value || 'All';
-  const category = document.getElementById('screener-category')?.value || 'All';
-  const minGmp = document.getElementById('screener-min-gmp')?.value || '';
-  const search = document.getElementById('screener-search')?.value || '';
+  const statusEl = document.getElementById('screener-status');
+  const status = statusEl ? statusEl.value : 'All';
+  const categoryEl = document.getElementById('screener-category');
+  const category = categoryEl ? categoryEl.value : 'All';
+  const minGmpEl = document.getElementById('screener-min-gmp');
+  const minGmp = minGmpEl ? minGmpEl.value : '';
+  const searchEl = document.getElementById('screener-search');
+  const search = searchEl ? searchEl.value : '';
 
   const grid = document.getElementById('screener-results-grid');
   if (!grid) return;
