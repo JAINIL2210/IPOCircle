@@ -1,6 +1,44 @@
 /**
- * IPOCircle Main SPA Router & UI Controller
+ * IPOCircle / IPO Pulse Main SPA Router & UI Controller
  */
+
+// ----------------------------------------------------
+// THEME CONTROLLER & LIVE CLOCK (LIGHT / DARK)
+// ----------------------------------------------------
+function toggleThemeMode() {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark');
+  
+  if (isDark) {
+    html.classList.remove('dark');
+    html.classList.add('light');
+    localStorage.setItem('theme', 'light');
+  } else {
+    html.classList.remove('light');
+    html.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+  }
+  
+  setTimeout(() => {
+    if (window.lucide) lucide.createIcons();
+  }, 30);
+}
+window.toggleThemeMode = toggleThemeMode;
+
+function startLiveClock() {
+  const clockEl = document.getElementById('ist-live-clock');
+  if (!clockEl) return;
+  
+  function updateClock() {
+    const now = new Date();
+    const istOptions = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    const istTime = now.toLocaleTimeString('en-IN', istOptions);
+    clockEl.innerText = `IST: ${istTime}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+window.startLiveClock = startLiveClock;
 
 // Global State
 const state = {
