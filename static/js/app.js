@@ -50,19 +50,31 @@ const state = {
   currentPath: window.location.pathname
 };
 
-// Initialize Application
+// Initialize Application (Instant Non-Blocking Initialization)
 async function init() {
-  startLiveClock();
-  await checkAuth();
-  await loadTopTicker();
-  await loadIPOsData();
+  try {
+    startLiveClock();
+  } catch (e) {}
+
+  // Render initial route immediately without waiting for API
+  const path = window.location.pathname;
+  handleRoute(path);
+
+  // Fetch data in background and update views
+  try {
+    checkAuth();
+    loadTopTicker();
+    await loadIPOsData();
+  } catch (e) {
+    console.error("Init data load error:", e);
+  }
 
   // 30-Second live frontend polling for active GMP & ticker data
   setInterval(async () => {
     try {
       const res = await fetch('/api/gmp/live');
       const json = await res.json();
-      if (json.success) {
+      if (json.success && json.gmp_data) {
         state.gmpData = json.gmp_data;
         updateTopTickerUI(json.gmp_data);
       }
@@ -71,15 +83,17 @@ async function init() {
     }
   }, 30000);
 
-  const path = window.location.pathname;
-  handleRoute(path);
-
   window.addEventListener('popstate', () => {
     handleRoute(window.location.pathname);
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// Ensure init executes whether script loads before or after DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 // Client-side Router
 function navigateTo(path) {
@@ -261,9 +275,13 @@ async function loadIPOsData() {
   try {
     const res = await fetch('/api/ipos');
     const data = await res.json();
-    if (data.success) {
+    if (data.success && data.ipos) {
       state.ipos = data.ipos;
       populateModalIpoDropdown();
+      const path = window.location.pathname;
+      if (path === '/' || path === '' || path === '/gmp' || path.startsWith('/screener') || path === '/allotment' || path === '/calculator') {
+        handleRoute(path);
+      }
     }
   } catch (err) {
     console.error('Error loading IPOs', err);
