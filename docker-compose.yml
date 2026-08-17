@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://ipouser:ipopassword@postgres:5432/ipodb
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=ipocircle-secret-key-prod-2026
+      - JWT_SECRET_KEY=ipocircle-jwt-secret-key-2026
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=ipouser
+      - POSTGRES_PASSWORD=ipopassword
+      - POSTGRES_DB=ipodb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
