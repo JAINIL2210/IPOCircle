@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>IPOCircle - Live IPO GMP, Subscription, Allotment Status & Screener</title>
+  <meta name="description" content="IPOCircle is India's leading IPO tracking platform. Check live IPO GMP, real-time subscription stats, single & bulk PAN allotment status, IPO calendar, financial research, and expert reviews.">
+  <meta name="theme-color" content="#0b0f19">
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/trending-up.png">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            },
+            dark: {
+              base: '#0b0f19',
+              card: '#111827',
+              border: '#1f2937',
+              hover: '#374151'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Lucide Icons & Chart.js -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-[#0b0f19] text-gray-100 min-h-screen flex flex-col antialiased selection:bg-blue-500 selection:text-white pb-16 md:pb-0">
+
+  <!-- Top Live GMP Ticker Bar -->
+  <div class="bg-gray-900 border-b border-gray-800 text-xs py-2 px-4 overflow-hidden">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2 shrink-0">
+        <span class="pulse-dot"></span>
+        <span class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">LIVE DAILY GMP</span>
+        <button onclick="triggerLiveIngestionSync()" title="Sync live GMP and current IPO data from market feeds" class="px-2 py-0.5 bg-emerald-950 border border-emerald-700 hover:bg-emerald-900 text-emerald-300 font-bold rounded text-[10px] flex items-center transition">
+          <i data-lucide="refresh-cw" class="w-3 h-3 mr-1"></i> Sync Now
+        </button>
+        <span class="text-gray-600">|</span>
+      </div>
+      <div id="top-gmp-ticker" class="flex space-x-6 overflow-x-auto no-scrollbar whitespace-nowrap text-gray-300 font-medium">
+        <span>Loading live market GMP data...</span>
+      </div>
+      <div class="hidden md:flex items-center space-x-3 shrink-0 text-gray-400">
+        <span><i data-lucide="check-circle-2" class="inline w-3 h-3 text-emerald-400 mr-1"></i> Auto-Sync Active (Every 6h)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="glass-header sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <a href="/" onclick="navigateTo('/'); return false;" class="flex items-center space-x-2">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+              <span class="text-xl font-black tracking-tight text-white">IPO<span class="text-blue-500">CIRCLE</span></span>
+              <span class="block text-[10px] font-bold text-emerald-400 -mt-1 tracking-widest uppercase">FINTECH PLATFORM</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="hidden lg:flex flex-1 max-w-xs mx-6">
+          <div class="relative w-full">
+            <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+            <input type="text" id="global-search" placeholder="Search IPO by name or symbol..." 
+                   oninput="handleGlobalSearch(this.value)"
+                   class="w-full bg-gray-800/80 border border-gray-700 rounded-lg pl-9 pr-4 py-1.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            <div id="search-results-dropdown" class="hidden absolute top-11 left-0 right-0 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl z-50 max-h-80 overflow-y-auto"></div>
+          </div>
+        </div>
+
+        <!-- Navigation Links (Desktop) -->
+        <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-xs font-semibold">
+          <a href="/" onclick="navigateTo('/'); return false;" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">Home</a>
+          <a href="/gmp" onclick="navigateTo('/gmp'); return false;" class="nav-link px-3 py-2 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 transition flex items-center">
+            <i data-lucide="zap" class="w-3.5 h-3.5 mr-1 text-emerald-400"></i> Live GMP
+          </a>
+          <a href="/screener" onclick="navigateTo('/screener'); return false;" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">Screener</a>
+          <a href="/subscription" onclick="navigateTo('/subscription'); return false;" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">Subscription</a>
+          <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="nav-link px-3 py-2 rounded-lg text-blue-400 hover:text-blue-300 hover:bg-blue-950/40 transition flex items-center">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 mr-1"></i> Allotment
+          </a>
+          <a href="/calendar" onclick="navigateTo('/calendar'); return false;" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">Calendar</a>
+          <a href="/calculator" onclick="navigateTo('/calculator'); return false;" class="nav-link px-3 py-2 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 transition">Chances</a>
+          <a href="/reviews" onclick="navigateTo('/reviews'); return false;" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">Reviews</a>
+          <a href="/blog" onclick="navigateTo('/blog'); return false;" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">Guides</a>
+        </nav>
+
+        <!-- Right User Actions -->
+        <div class="flex items-center space-x-3">
+          <!-- Quick Allotment CTA -->
+          <button onclick="openQuickAllotmentModal()" class="hidden sm:inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold text-xs shadow-md shadow-blue-500/20 hover:from-blue-500 hover:to-indigo-500 transition">
+            <i data-lucide="search" class="w-3.5 h-3.5 mr-1.5"></i> Check Allotment
+          </button>
+
+          <!-- User Menu / Login -->
+          <div id="auth-header-area">
+            <button onclick="openAuthModal()" class="px-3 py-1.5 border border-gray-700 hover:border-gray-600 rounded-lg text-xs font-semibold text-gray-200 hover:bg-gray-800 transition">
+              Login / Sign Up
+            </button>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <button onclick="toggleMobileNav()" class="md:hidden text-gray-300 hover:text-white focus:outline-none p-1">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-nav" class="hidden md:hidden bg-gray-900 border-b border-gray-800 px-4 pt-2 pb-4 space-y-2">
+      <a href="/" onclick="navigateTo('/'); toggleMobileNav(); return false;" class="block py-2 text-gray-200 font-medium">Home</a>
+      <a href="/gmp" onclick="navigateTo('/gmp'); toggleMobileNav(); return false;" class="block py-2 text-emerald-400 font-medium">Live GMP Dashboard</a>
+      <a href="/screener" onclick="navigateTo('/screener'); toggleMobileNav(); return false;" class="block py-2 text-gray-200 font-medium">IPO Screener</a>
+      <a href="/subscription" onclick="navigateTo('/subscription'); toggleMobileNav(); return false;" class="block py-2 text-gray-200 font-medium">Live Subscription Tracker</a>
+      <a href="/allotment" onclick="navigateTo('/allotment'); toggleMobileNav(); return false;" class="block py-2 text-blue-400 font-medium">Allotment Checker (Single & Bulk)</a>
+      <a href="/calendar" onclick="navigateTo('/calendar'); toggleMobileNav(); return false;" class="block py-2 text-gray-200 font-medium">Upcoming Calendar</a>
+      <a href="/calculator" onclick="navigateTo('/calculator'); toggleMobileNav(); return false;" class="block py-2 text-amber-400 font-medium">Allotment Chances Calculator</a>
+      <a href="/reviews" onclick="navigateTo('/reviews'); toggleMobileNav(); return false;" class="block py-2 text-gray-200 font-medium">IPO Reviews & Research</a>
+      <a href="/blog" onclick="navigateTo('/blog'); toggleMobileNav(); return false;" class="block py-2 text-gray-200 font-medium">Blogs & Educational Guides</a>
+      <a href="/watchlist" onclick="navigateTo('/watchlist'); toggleMobileNav(); return false;" class="block py-2 text-indigo-400 font-medium">My Watchlist & Saved PANs</a>
+      <a href="/admin" onclick="navigateTo('/admin'); toggleMobileNav(); return false;" class="block py-2 text-rose-400 font-medium">Admin Dashboard</a>
+    </div>
+  </header>
+
+  <!-- Main Dynamic SPA Content Container -->
+  <main id="app-content" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex items-center justify-center py-20">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-800 text-gray-400 text-xs mt-12 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+        <div class="md:col-span-2 space-y-4">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+              <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
+            </div>
+            <span class="text-lg font-bold text-white tracking-tight">IPO<span class="text-blue-500">CIRCLE</span></span>
+          </div>
+          <p class="text-gray-400 text-xs leading-relaxed max-w-sm">
+            India's most trusted production-grade IPO tracking platform. Real-time live GMP indicators, official subscription statistics, bulk PAN allotment status checking, and research analytics.
+          </p>
+          <div class="flex space-x-3 text-gray-400">
+            <span class="px-2 py-1 bg-gray-900 border border-gray-800 rounded text-[10px] font-mono">SEBI Compliant Disclaimers</span>
+            <span class="px-2 py-1 bg-gray-900 border border-gray-800 rounded text-[10px] font-mono">SSL Encrypted</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">IPO Navigation</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="/gmp" onclick="navigateTo('/gmp'); return false;" class="hover:text-white transition">Live IPO GMP</a></li>
+            <li><a href="/screener" onclick="navigateTo('/screener'); return false;" class="hover:text-white transition">IPO Screener</a></li>
+            <li><a href="/subscription" onclick="navigateTo('/subscription'); return false;" class="hover:text-white transition">Live Subscription</a></li>
+            <li><a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="hover:text-white transition">Allotment Status Checker</a></li>
+            <li><a href="/calendar" onclick="navigateTo('/calendar'); return false;" class="hover:text-white transition">Upcoming IPO Calendar</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Research & Tools</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="/calculator" onclick="navigateTo('/calculator'); return false;" class="hover:text-white transition">Allotment Chances Calculator</a></li>
+            <li><a href="/reviews" onclick="navigateTo('/reviews'); return false;" class="hover:text-white transition">IPO Reviews & Rating</a></li>
+            <li><a href="/blog" onclick="navigateTo('/blog'); return false;" class="hover:text-white transition">Educational IPO Guides</a></li>
+            <li><a href="/watchlist" onclick="navigateTo('/watchlist'); return false;" class="hover:text-white transition">My Saved Watchlist</a></li>
+            <li><a href="/admin" onclick="navigateTo('/admin'); return false;" class="hover:text-white transition text-rose-400">Admin Control Panel</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Android App</h4>
+          <p class="text-gray-400 text-xs mb-3">Get instant push alerts for GMP spikes & allotment results.</p>
+          <button onclick="triggerAppInstallPrompt()" class="w-full bg-gray-900 hover:bg-gray-800 border border-gray-700 text-white font-semibold py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-xs transition">
+            <i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i>
+            <span>Install App on Device</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-900 pt-6 space-y-3 text-[11px] text-gray-500">
+        <p>
+          <strong class="text-gray-400">Disclaimer:</strong> IPO Grey Market Premium (GMP) data, subscription statistics, and allotment estimates displayed on IPOCircle are gathered from market sources and unofficial over-the-counter intelligence. They do not constitute investment advice or a recommendation to buy or sell securities. Past performance is not indicative of future returns. Please consult a SEBI registered investment advisor before placing bids.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-between items-center text-gray-500 pt-2">
+          <span>&copy; 2026 IPOCircle Financial Technologies. All rights reserved.</span>
+          <span class="mt-2 sm:mt-0 font-mono">Last Ingestion Sync: <span id="last-sync-time" class="text-emerald-400 font-semibold">Live Real-time</span></span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Sticky Mobile Bottom Navigation Bar -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-950/95 backdrop-blur-md border-t border-gray-800 z-50 px-2 py-1.5 flex justify-around items-center">
+    <a href="/" onclick="navigateTo('/'); return false;" class="flex flex-col items-center text-gray-400 hover:text-white py-1">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Home</span>
+    </a>
+    <a href="/gmp" onclick="navigateTo('/gmp'); return false;" class="flex flex-col items-center text-emerald-400 hover:text-emerald-300 py-1">
+      <i data-lucide="zap" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Live GMP</span>
+    </a>
+    <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="flex flex-col items-center text-blue-400 hover:text-blue-300 py-1">
+      <i data-lucide="check-circle" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Allotment</span>
+    </a>
+    <a href="/screener" onclick="navigateTo('/screener'); return false;" class="flex flex-col items-center text-gray-400 hover:text-white py-1">
+      <i data-lucide="filter" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Screener</span>
+    </a>
+    <a href="/calculator" onclick="navigateTo('/calculator'); return false;" class="flex flex-col items-center text-amber-400 hover:text-amber-300 py-1">
+      <i data-lucide="calculator" class="w-5 h-5"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Chances</span>
+    </a>
+  </nav>
+
+  <!-- Modal Container for Quick Allotment -->
+  <div id="quick-allotment-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+      <button onclick="closeQuickAllotmentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-lg font-bold text-white flex items-center">
+        <i data-lucide="search" class="w-5 h-5 text-blue-500 mr-2"></i> Quick IPO Allotment Checker
+      </h3>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Select IPO</label>
+          <select id="modal-ipo-select" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">PAN Number</label>
+          <input type="text" id="modal-pan-input" uppercase placeholder="e.g. ABCDE1234F" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 font-mono uppercase">
+        </div>
+        <button onclick="handleQuickCheckSubmit()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-sm transition">
+          Check Allotment Status
+        </button>
+      </div>
+      <div id="modal-result-output" class="hidden pt-2"></div>
+    </div>
+  </div>
+
+  <!-- Modal Container for Auth -->
+  <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="flex border-b border-gray-800 text-sm font-semibold">
+        <button id="tab-login-btn" onclick="switchAuthTab('login')" class="flex-1 py-2 text-blue-400 border-b-2 border-blue-500 text-center">Login</button>
+        <button id="tab-register-btn" onclick="switchAuthTab('register')" class="flex-1 py-2 text-gray-400 text-center">Sign Up</button>
+      </div>
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3">
+        <div id="auth-name-field" class="hidden">
+          <label class="block text-xs text-gray-400 mb-1">Full Name</label>
+          <input type="text" id="auth-name" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-sm text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Email Address</label>
+          <input type="email" id="auth-email" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-sm text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Password</label>
+          <input type="password" id="auth-password" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-sm text-white">
+        </div>
+        <div id="auth-error-msg" class="hidden text-xs text-rose-400"></div>
+        <button type="submit" id="auth-submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-sm transition">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
