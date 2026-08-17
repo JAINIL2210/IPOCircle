@@ -50,12 +50,12 @@ function handleRoute(path) {
     renderHomePage(container);
   } else if (path === '/gmp') {
     renderGmpPage(container);
-  } else if (path === '/screener') {
-    renderScreenerPage(container);
+  } else if (path === '/screener' || path === '/ipo' || path === '/ipo/mainboard' || path === '/ipo/sme' || path === '/ipo/upcoming' || path === '/ipo/ongoing' || path === '/ipo/closed') {
+    renderScreenerPage(container, path);
   } else if (path === '/subscription') {
     renderSubscriptionPage(container);
-  } else if (path === '/allotment') {
-    renderAllotmentPage(container);
+  } else if (path === '/allotment' || path === '/check-allotment' || path === '/check-allotment/bulk') {
+    renderAllotmentPage(container, path);
   } else if (path === '/calendar') {
     renderCalendarPage(container);
   } else if (path === '/calculator') {
@@ -65,10 +65,10 @@ function handleRoute(path) {
     renderIpoDetailPage(container, slug);
   } else if (path === '/reviews') {
     renderReviewsPage(container);
-  } else if (path === '/blog') {
+  } else if (path === '/blog' || path === '/blogs') {
     renderBlogListPage(container);
-  } else if (path.startsWith('/blog/')) {
-    const slug = path.replace('/blog/', '');
+  } else if (path.startsWith('/blog/') || path.startsWith('/blogs/')) {
+    const slug = path.replace('/blog/', '').replace('/blogs/', '');
     renderBlogDetailPage(container, slug);
   } else if (path === '/watchlist') {
     renderWatchlistPage(container);
@@ -566,13 +566,22 @@ function filterGmpTable() {
 // ----------------------------------------------------
 // 3. IPO SCREENER RENDER
 // ----------------------------------------------------
-async function renderScreenerPage(container) {
+async function renderScreenerPage(container, path = '') {
+  let defaultCategory = 'All';
+  let defaultStatus = 'All';
+
+  if (path === '/ipo/mainboard') defaultCategory = 'Mainboard';
+  if (path === '/ipo/sme') defaultCategory = 'SME';
+  if (path === '/ipo/upcoming') defaultStatus = 'Upcoming';
+  if (path === '/ipo/ongoing') defaultStatus = 'Ongoing';
+  if (path === '/ipo/closed') defaultStatus = 'Closed';
+
   container.innerHTML = `
     <div class="space-y-6">
       
       <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl space-y-4">
         <h1 class="text-2xl font-black text-white flex items-center">
-          <i data-lucide="filter" class="w-6 h-6 text-blue-500 mr-2"></i> IPO Screener
+          <i data-lucide="filter" class="w-6 h-6 text-blue-500 mr-2"></i> IPO Directory & Screener
         </h1>
         <p class="text-xs text-gray-400">Filter Indian IPOs by market segment, issue status, price range, GMP premium, and subscription multiple.</p>
         
@@ -581,19 +590,19 @@ async function renderScreenerPage(container) {
           <div>
             <label class="block text-xs font-semibold text-gray-400 mb-1">Status</label>
             <select id="screener-status" onchange="runScreenerQuery()" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-2.5 text-xs text-white">
-              <option value="All">All Statuses</option>
-              <option value="Ongoing">Ongoing Bidding</option>
-              <option value="Upcoming">Upcoming IPOs</option>
-              <option value="Listed">Listed IPOs</option>
-              <option value="Closed">Closed IPOs</option>
+              <option value="All" ${defaultStatus === 'All' ? 'selected' : ''}>All Statuses</option>
+              <option value="Ongoing" ${defaultStatus === 'Ongoing' ? 'selected' : ''}>Ongoing Bidding</option>
+              <option value="Upcoming" ${defaultStatus === 'Upcoming' ? 'selected' : ''}>Upcoming IPOs</option>
+              <option value="Listed" ${defaultStatus === 'Listed' ? 'selected' : ''}>Listed IPOs</option>
+              <option value="Closed" ${defaultStatus === 'Closed' ? 'selected' : ''}>Closed IPOs</option>
             </select>
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-400 mb-1">Market Category</label>
             <select id="screener-category" onchange="runScreenerQuery()" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-2.5 text-xs text-white">
-              <option value="All">All Categories</option>
-              <option value="Mainboard">Mainboard</option>
-              <option value="SME">SME</option>
+              <option value="All" ${defaultCategory === 'All' ? 'selected' : ''}>All Categories</option>
+              <option value="Mainboard" ${defaultCategory === 'Mainboard' ? 'selected' : ''}>Mainboard</option>
+              <option value="SME" ${defaultCategory === 'SME' ? 'selected' : ''}>SME</option>
             </select>
           </div>
           <div>

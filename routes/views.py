@@ -1,13 +1,19 @@
-from flask import Blueprint, render_template, send_from_directory
-import os
+from flask import Blueprint, render_template
 
 views = Blueprint('views', __name__)
 
 @views.route('/')
+@views.route('/ipo')
+@views.route('/ipo/upcoming')
+@views.route('/ipo/ongoing')
+@views.route('/ipo/closed')
+@views.route('/ipo/mainboard')
+@views.route('/ipo/sme')
 @views.route('/gmp')
-@views.route('/screener')
 @views.route('/subscription')
 @views.route('/allotment')
+@views.route('/check-allotment')
+@views.route('/check-allotment/bulk')
 @views.route('/calendar')
 @views.route('/calculator')
 @views.route('/ipo/<slug>')
