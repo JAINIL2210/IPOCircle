@@ -1,5 +1,5 @@
-/* IPOCircle Modern FinTech Theme Styles */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+/* IPOCircle FinTech Theme (Inspired by IPOWiz) */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
   --bg-primary: #0b0f19;
@@ -17,21 +17,22 @@
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-main);
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: #0b0f19;
 }
 ::-webkit-scrollbar-thumb {
   background: #374151;
@@ -41,14 +42,14 @@ body {
   background: #4b5563;
 }
 
-/* Badge styles */
+/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -89,28 +90,30 @@ body {
   border: 1px solid rgba(236, 72, 153, 0.3);
 }
 
-/* Financial Stat Card */
+/* IPO Card Styling */
 .stat-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
+  background-color: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 1rem;
   padding: 1.25rem;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .stat-card:hover {
-  border-color: #4b5563;
+  border-color: #374151;
   transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
 /* Glassmorphism Header */
 .glass-header {
-  background-color: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-color);
+  background-color: rgba(11, 15, 25, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #1f2937;
 }
 
-/* Live Ticker Pulse */
+/* Pulsing Live Dot */
 .pulse-dot {
   width: 8px;
   height: 8px;
@@ -135,7 +138,7 @@ body {
   }
 }
 
-/* Table styling */
+/* Custom IPOWiz Data Table */
 .custom-table {
   width: 100%;
   border-collapse: separate;
@@ -144,20 +147,20 @@ body {
 .custom-table th {
   background-color: #111827;
   color: #9ca3af;
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid #1f2937;
 }
 .custom-table td {
   padding: 1rem;
-  border-bottom: 1px solid #1f2937;
-  font-size: 0.875rem;
+  border-bottom: 1px solid #111827;
+  font-size: 0.85rem;
   color: #e5e7eb;
 }
 .custom-table tr:hover td {
-  background-color: rgba(55, 65, 81, 0.4);
+  background-color: rgba(31, 41, 55, 0.5);
 }
