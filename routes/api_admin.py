@@ -55,8 +55,10 @@ def admin_create_ipo():
 @api_admin.route('/api/admin/gmp/update', methods=['POST'])
 def admin_update_gmp():
     data = request.get_json() or {}
-    ipo_id = data.get('ipo_id')
-    gmp_amount = float(data.get('gmp_amount', 0))
+    try:
+        gmp_amount = float(data.get('gmp_amount') or 0)
+    except (ValueError, TypeError):
+        gmp_amount = 0.0
     source = data.get('data_source', 'Grey Market Desk (Verified Admin)')
 
     ipo = IPO.query.get(ipo_id)
