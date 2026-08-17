@@ -1137,10 +1137,10 @@ async function renderIpoDetailPage(container, slug) {
     const sub = ipo.subscription || { qib_x: 1, nii_x: 1, retail_x: 1, total_x: 1 };
     const rev = ipo.review || { summary: 'Under research analysis', rating: 'Neutral', strengths: [], risks: [] };
 
+    const regName = ipo.registrar_name || '';
     const regUrl = ipo.registrar_url || (
-      'https://kosmic.kfintech.com/ipostatus/' if 'KFin' in (ipo.registrar_name || '') 
-      else ('https://bigshareonline.com/ipo_gm.html' if 'Bigshare' in (ipo.registrar_name || '') 
-      else 'https://linkintime.co.in/ipoallotment.html')
+      regName.includes('KFin') ? 'https://kosmic.kfintech.com/ipostatus/' :
+      (regName.includes('Bigshare') ? 'https://bigshareonline.com/ipo_gm.html' : 'https://linkintime.co.in/ipoallotment.html')
     );
 
     container.innerHTML = `
