@@ -43,6 +43,22 @@ def get_ongoing_ipos():
         'ipos': [ipo.to_dict() for ipo in ipos]
     })
 
+@api_ipos.route('/api/ipos/closed', methods=['GET'])
+def get_closed_ipos():
+    ipos = IPO.query.filter(IPO.status.in_(['Closed', 'Listed'])).all()
+    return jsonify({
+        'success': True,
+        'ipos': [ipo.to_dict() for ipo in ipos]
+    })
+
+@api_ipos.route('/api/ipos/listed', methods=['GET'])
+def get_listed_ipos():
+    ipos = IPO.query.filter_by(status='Listed').all()
+    return jsonify({
+        'success': True,
+        'ipos': [ipo.to_dict() for ipo in ipos]
+    })
+
 @api_ipos.route('/api/ipos/screener', methods=['GET'])
 def screener():
     status = request.args.get('status', 'All')

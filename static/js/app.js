@@ -437,29 +437,29 @@ function renderHomePage(container) {
         </div>
 
         <!-- Quick Allotment Lookup Widget -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
-          <h3 class="text-lg font-bold text-slate-900 flex items-center">
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
             <i data-lucide="shield-check" class="w-5 h-5 text-blue-600 mr-2"></i> Quick IPO Allotment Checker
           </h3>
-          <p class="text-xs text-slate-600">
+          <p class="text-xs text-slate-600 dark:text-slate-400">
             Check your application status across Link Intime, KFintech, Bigshare, and Maashitla directly.
           </p>
           <div class="space-y-3">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Select IPO</label>
-              <select id="home-ipo-select" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm text-slate-900 focus:border-blue-600">
-                ${state.ipos.map(i => `<option value="${i.id}">${i.name}</option>`).join('')}
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select IPO</label>
+              <select id="home-ipo-select" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white focus:border-blue-600">
+                ${state.ipos.map(i => `<option value="${i.id}">${i.name} [${i.status === 'Listed' || i.status === 'Closed' ? 'Allotment Declared' : i.status}]</option>`).join('')}
               </select>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">PAN Number</label>
-              <input type="text" id="home-pan-input" uppercase placeholder="Enter 10-digit PAN (e.g. ABCDE1234F)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm text-slate-900 focus:border-blue-600 font-mono uppercase">
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">PAN Number</label>
+              <input type="text" id="home-pan-input" uppercase placeholder="Enter 10-digit PAN (e.g. ABCDE1234F)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white focus:border-blue-600 font-mono uppercase">
             </div>
             <div class="flex space-x-3">
               <button onclick="handleHomeQuickCheck()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition">
                 Check Status
               </button>
-              <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition text-center">
+              <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-sm transition text-center">
                 Bulk Check
               </a>
             </div>
@@ -467,6 +467,69 @@ function renderHomePage(container) {
           </div>
         </div>
 
+      </div>
+
+      <!-- Recently Closed & Listed IPOs Section -->
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white flex items-center">
+              <i data-lucide="award" class="w-5 h-5 text-emerald-600 dark:text-emerald-400 mr-2"></i> Recently Closed & Listed IPOs (Allotment Declared)
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Allotment status declared by registrar with verified listing day returns and final subscription numbers.</p>
+          </div>
+          <a href="/screener?status=Listed" onclick="navigateTo('/screener?status=Listed'); return false;" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">View All Listed &rarr;</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          ${listed.map(ipo => {
+            const g = ipo.gmp || { gmp_amount: 0, gmp_percent: 0, estimated_listing_price: ipo.upper_price, estimated_profit_per_lot: 0 };
+            return `
+              <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-2xl p-5 space-y-3 shadow-sm transition">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <span class="badge ${ipo.category === 'Mainboard' ? 'badge-mainboard' : 'badge-sme'} mb-1">${ipo.category}</span>
+                    <h3 onclick="navigateTo('/ipo/${ipo.slug}')" class="font-bold text-slate-900 dark:text-white text-base cursor-pointer hover:text-blue-600 transition">${ipo.name}</h3>
+                    <div class="text-xs text-slate-500 dark:text-slate-400">${ipo.sector}</div>
+                  </div>
+                  <span class="badge ${ipo.status === 'Listed' ? 'badge-listed' : 'badge-closed'}">${ipo.status}</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60">
+                  <div>
+                    <span class="text-slate-500 dark:text-slate-400">Issue Price:</span>
+                    <div class="font-bold text-slate-900 dark:text-white">₹${ipo.issue_price}</div>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 dark:text-slate-400">Listing Price:</span>
+                    <div class="font-bold text-emerald-600 dark:text-emerald-400">₹${g.estimated_listing_price || (ipo.issue_price + g.gmp_amount)}</div>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 dark:text-slate-400">Listing Return:</span>
+                    <div class="font-black text-emerald-600 dark:text-emerald-400">+${g.gmp_percent}%</div>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 dark:text-slate-400">Final Sub:</span>
+                    <div class="font-bold text-blue-600 dark:text-blue-400">${ipo.subscription ? ipo.subscription.total_x + 'x' : '12.0x'}</div>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs pt-1">
+                  <span class="text-slate-500 dark:text-slate-400">Registrar: <strong class="text-slate-700 dark:text-slate-300">${ipo.registrar_name || 'Link Intime'}</strong></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs text-center shadow-sm transition">
+                    Check Allotment
+                  </a>
+                  <a href="/ipo/${ipo.slug}" onclick="navigateTo('/ipo/${ipo.slug}'); return false;" class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold rounded-xl text-xs text-center transition">
+                    View Details
+                  </a>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       </div>
 
       <!-- Educational & Guides Section -->
@@ -910,7 +973,7 @@ function renderAllotmentPage(container) {
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select IPO</label>
             <select id="single-ipo-select" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white focus:border-blue-600">
-              ${state.ipos.map(i => `<option value="${i.id}">${i.name} (${i.status})</option>`).join('')}
+              ${state.ipos.map(i => `<option value="${i.id}">${i.name} [${i.status === 'Listed' || i.status === 'Closed' ? 'Allotment Declared' : i.status}] - ${i.registrar_name || 'Link Intime'}</option>`).join('')}
             </select>
           </div>
           <div>
@@ -932,7 +995,7 @@ function renderAllotmentPage(container) {
             <div>
               <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select IPO</label>
               <select id="bulk-ipo-select" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
-                ${state.ipos.map(i => `<option value="${i.id}">${i.name}</option>`).join('')}
+                ${state.ipos.map(i => `<option value="${i.id}">${i.name} [${i.status === 'Listed' || i.status === 'Closed' ? 'Allotment Declared' : i.status}]</option>`).join('')}
               </select>
             </div>
             
@@ -1388,6 +1451,48 @@ async function renderIpoDetailPage(container, slug) {
             </a>
           </div>
         </div>
+
+        ${(ipo.status === 'Listed' || ipo.status === 'Closed') ? `
+          <!-- Closed / Listed IPO Performance Card -->
+          <div class="p-6 bg-gradient-to-r from-emerald-950/80 via-teal-950/80 to-slate-900 border border-emerald-500/40 rounded-2xl text-white space-y-4 shadow-lg">
+            <div class="flex flex-wrap justify-between items-center gap-3 border-b border-white/10 pb-3">
+              <div>
+                <span class="badge badge-listed text-xs px-3 py-1 font-bold uppercase">Allotment Declared • Listed on Exchanges</span>
+                <h3 class="text-lg sm:text-xl font-black text-white mt-1">Official Listing Performance</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-xs text-emerald-200">Listing Day Return</span>
+                <div class="text-2xl font-black text-emerald-400">+${g.gmp_percent}% (+₹${g.gmp_amount})</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-black/40 p-4 rounded-xl border border-white/10">
+              <div>
+                <span class="text-slate-400">Issue / Offer Price:</span>
+                <div class="font-bold text-white text-sm">₹${ipo.issue_price}</div>
+              </div>
+              <div>
+                <span class="text-slate-400">Listing Day Price:</span>
+                <div class="font-black text-emerald-400 text-sm">₹${g.estimated_listing_price || (ipo.issue_price + g.gmp_amount)}</div>
+              </div>
+              <div>
+                <span class="text-slate-400">Listing Profit / Lot:</span>
+                <div class="font-bold text-white text-sm">₹${g.estimated_profit_per_lot.toLocaleString()}</div>
+              </div>
+              <div>
+                <span class="text-slate-400">Listing Date:</span>
+                <div class="font-bold text-white text-sm">${ipo.listing_date || 'N/A'}</div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs pt-1">
+              <span class="text-slate-300">Allotment Registrar: <strong class="text-white">${ipo.registrar_name || 'Link Intime'}</strong></span>
+              <a href="/allotment" onclick="navigateTo('/allotment'); return false;" class="text-emerald-400 font-bold hover:underline flex items-center">
+                Check Your PAN Allotment Result &rarr;
+              </a>
+            </div>
+          </div>
+        ` : ''}
 
         <!-- Metric Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
