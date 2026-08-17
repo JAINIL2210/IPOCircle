@@ -5,6 +5,17 @@
 // ----------------------------------------------------
 // THEME CONTROLLER & LIVE CLOCK (LIGHT / DARK)
 // ----------------------------------------------------
+function safeCreateIcons() {
+  if (window.lucide && typeof lucide.createIcons === 'function') {
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn("Lucide render note:", e);
+    }
+  }
+}
+window.safeCreateIcons = safeCreateIcons;
+
 function toggleThemeMode() {
   const html = document.documentElement;
   const isDark = html.classList.contains('dark');
@@ -19,9 +30,7 @@ function toggleThemeMode() {
     localStorage.setItem('theme', 'dark');
   }
   
-  setTimeout(() => {
-    if (window.lucide) lucide.createIcons();
-  }, 30);
+  setTimeout(safeCreateIcons, 30);
 }
 window.toggleThemeMode = toggleThemeMode;
 
@@ -161,7 +170,7 @@ function handleRoute(path) {
     renderHomePage(container);
   }
 
-  setTimeout(() => lucide.createIcons(), 50);
+  setTimeout(safeCreateIcons, 50);
 }
 
 // ----------------------------------------------------
@@ -224,7 +233,7 @@ async function triggerLiveIngestionSync() {
   const tickerEl = document.getElementById('top-gmp-ticker');
   if (tickerEl) {
     tickerEl.innerHTML = `<span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center"><i data-lucide="loader-2" class="w-3 h-3 animate-spin mr-1"></i> Syncing live Indian market IPO data...</span>`;
-    lucide.createIcons();
+    safeCreateIcons();
   }
   try {
     const res = await fetch('/api/admin/sync-live', { method: 'POST' });
@@ -1133,12 +1142,171 @@ async function handleBulkCheckSubmit() {
           </div>
         </div>
       `;
+      safeCreateIcons();
     }
   } catch (err) {
     out.innerHTML = `<div class="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs">Failed processing bulk batch.</div>`;
   }
 }
 
+// ----------------------------------------------------
+// 6. UPCOMING IPO CALENDAR RENDER
+// ----------------------------------------------------
+async function renderCalendarPage(container) {
+  container.innerHTML = `
+    <div class="space-y-6">
+      <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-6 rounded-2xl space-y-2 shadow-sm">
+        <h1 class="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+          <i data-lucide="calendar" class="w-6 h-6 text-blue-600 dark:text-blue-400 mr-2"></i> Upcoming IPO Calendar
+        </h1>
+        <p class="text-xs text-slate-600 dark:text-slate-400">Key milestone dates: Bidding Open/Close, Allotment Declaration, and Listing Dates.</p>
+      </div>
+
+      <div id="calendar-timeline-container" class="space-y-4">
+        <div class="text-center py-12 text-slate-500">Loading calendar events...</div>
+      </div>
+    </div>
+  `;
+
+  try {
+    const res = await fetch('/api/calendar');
+    const data = await res.json();
+    if (data.success && data.events) {
+      const containerEl = document.getElementById('calendar-timeline-container');
+      containerEl.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${data.events.map(ev => `
+            <div onclick="navigateTo('/ipo/${ev.slug}')" class="p-4 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-2xl cursor-pointer flex items-center justify-between shadow-sm transition">
+              <div class="space-y-1">
+                <span class="badge ${ev.event.includes('Opens') ? 'badge-open' : (ev.event.includes('Closes') ? 'badge-closed' : 'badge-upcoming')}">${ev.event}</span>
+                <div class="font-bold text-slate-900 dark:text-white text-base">${ev.name}</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">${ev.category}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm font-black text-blue-600 dark:text-blue-400">${ev.date}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      safeCreateIcons();
+    }
+  } catch (err) {
+    console.error('Calendar error', err);
+  }
+}
+
+// ----------------------------------------------------
+// 7. ALLOTMENT CHANCES CALCULATOR RENDER
+// ----------------------------------------------------
+function renderCalculatorPage(container) {
+  container.innerHTML = `
+    <div class="space-y-6 max-w-3xl mx-auto">
+      
+      <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-6 rounded-2xl space-y-2 shadow-sm">
+        <h1 class="text-2xl font-black text-slate-900 dark:text-white flex items-center">
+          <i data-lucide="calculator" class="w-6 h-6 text-amber-600 dark:text-amber-400 mr-2"></i> Allotment Chances Calculator
+        </h1>
+        <p class="text-xs text-slate-600 dark:text-slate-400">Educational lottery probability estimator based on retail computer draw mechanics and oversubscription ratios.</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select IPO</label>
+            <select id="calc-ipo-select" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
+              ${state.ipos.map(i => `<option value="${i.id}">${i.name} (Sub: ${i.subscription ? i.subscription.total_x : 1}x)</option>`).join('')}
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Investor Category</label>
+            <select id="calc-category-select" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
+              <option value="Retail (RII)">Retail Investor (Up to ₹2 Lakhs)</option>
+              <option value="Small NII (sNII)">Small NII (₹2 Lakhs - ₹10 Lakhs)</option>
+              <option value="Big NII (bNII)">Big NII (Above ₹10 Lakhs)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Subscription Multiple (x)</label>
+            <input type="number" step="0.1" id="calc-sub-x" value="15.0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Lots Applied</label>
+            <input type="number" id="calc-lots" value="1" min="1" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-sm text-slate-900 dark:text-white">
+          </div>
+        </div>
+
+        <button onclick="handleCalculateEstimate()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3.5 rounded-xl text-sm shadow-md transition">
+          Calculate Estimated Allotment Probability
+        </button>
+
+        <div id="calc-result-output" class="hidden pt-4 border-t border-slate-200 dark:border-slate-800"></div>
+      </div>
+
+    </div>
+  `;
+  safeCreateIcons();
+}
+
+async function handleCalculateEstimate() {
+  const ipoId = document.getElementById('calc-ipo-select').value;
+  const category = document.getElementById('calc-category-select').value;
+  const subX = document.getElementById('calc-sub-x').value;
+  const lots = document.getElementById('calc-lots').value;
+
+  const out = document.getElementById('calc-result-output');
+  out.classList.remove('hidden');
+
+  try {
+    const res = await fetch('/api/calculator/estimate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ipo_id: ipoId, category: category, subscription_x: subX, lots_applied: lots })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const c = data.calculation;
+      out.innerHTML = `
+        <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 space-y-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">${c.ipo_name}</h3>
+              <span class="text-xs text-slate-500 dark:text-slate-400">${c.category}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-500 dark:text-slate-400">Winning Chance</span>
+              <div class="text-2xl font-black text-amber-600 dark:text-amber-400">${c.probability_percent}%</div>
+            </div>
+          </div>
+
+          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2 text-xs">
+            <div class="flex justify-between">
+              <span class="text-slate-500 dark:text-slate-400">Lottery Odds:</span>
+              <strong class="text-slate-900 dark:text-white">${c.chance_ratio}</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 dark:text-slate-400">Total Investment Required:</span>
+              <strong class="text-slate-900 dark:text-white">₹${c.min_investment.toLocaleString()}</strong>
+            </div>
+          </div>
+
+          <div class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed bg-blue-50 dark:bg-blue-950/40 p-3 rounded-lg border border-blue-100 dark:border-blue-900/60">
+            <strong class="text-blue-700 dark:text-blue-300">Explanation:</strong> ${c.explanation}
+          </div>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error('Calculator error', err);
+  }
+}
+
+// ----------------------------------------------------
+// 8. IPO DETAILS / RESEARCH PAGE RENDER
+// ----------------------------------------------------
 async function renderIpoDetailPage(container, slug) {
   container.innerHTML = `<div class="text-center py-20 text-slate-500">Loading comprehensive IPO research breakdown...</div>`;
 
@@ -1419,10 +1587,11 @@ async function renderIpoDetailPage(container, slug) {
 
       </div>
     `;
-    lucide.createIcons();
+    safeCreateIcons();
   } catch (err) {
     console.error('Error fetching detail', err);
   }
+}
 
 // ----------------------------------------------------
 // 9. IPO REVIEWS PAGE RENDER

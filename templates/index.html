@@ -60,7 +60,7 @@
   </script>
 
   <!-- Custom Styles & Lucide Icons & Chart.js -->
-  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/style.css?v=20260817-3">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -346,11 +346,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="/static/js/app.js"></script>
+  <script src="/static/js/app.js?v=20260817-3"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-    });
+    if (typeof init === 'function') {
+      init();
+    }
   </script>
 </body>
 </html>
