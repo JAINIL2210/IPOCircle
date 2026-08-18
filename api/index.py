@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 
 # Ensure project root directory is in sys.path
@@ -10,4 +10,7 @@ if root_dir not in sys.path:
 os.environ['VERCEL'] = '1'
 
 from app import app
+
+# Vercel entrypoints
+handler = app
 
