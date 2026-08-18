@@ -6,9 +6,14 @@ from models import (
 )
 from werkzeug.security import generate_password_hash
 
-def seed_database():
-    db.drop_all()
+def seed_database(force_drop=False):
+    if force_drop:
+        db.drop_all()
     db.create_all()
+
+    # Check if already seeded
+    if User.query.filter_by(email='admin@ipocircle.in').first() and IPO.query.count() > 0:
+        return
 
     # 1. Users
     admin_user = User(

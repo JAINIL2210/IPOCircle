@@ -91,6 +91,38 @@ python -m pytest
 
 ---
 
+## 🚀 Deploy to Vercel
+
+IPOCircle is pre-configured with `vercel.json` and `api/index.py` for **zero-config serverless deployment on Vercel**.
+
+### Method 1: Deploy via Vercel Dashboard (Recommended)
+
+1. Push your code to your GitHub repository ([`https://github.com/JAINIL2210/IPOCircle`](https://github.com/JAINIL2210/IPOCircle)).
+2. Log into [Vercel Dashboard](https://vercel.com/dashboard).
+3. Click **"Add New..."** -> **"Project"** and select **`IPOCircle`**.
+4. In the configuration step:
+   - **Framework Preset**: *Other*
+   - **Root Directory**: `./` (leave default)
+5. *(Optional)* Add Environment Variables if connecting an external PostgreSQL database (e.g., Supabase / Neon / Vercel Postgres):
+   - `DATABASE_URL` = `postgresql://user:password@host:port/dbname`
+   - `SECRET_KEY` = `your-secure-secret-key`
+6. Click **Deploy**. Vercel will automatically build the Python serverless function and serve the platform globally!
+
+### Method 2: Deploy via Vercel CLI
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Login to Vercel
+vercel login
+
+# Deploy to production
+vercel --prod
+```
+
+---
+
 ## 🐳 Docker Deployment
 
 To run the entire full-stack application with PostgreSQL and Redis via Docker Compose:

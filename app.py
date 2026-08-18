@@ -3,8 +3,14 @@ from flask import Flask
 from config import Config
 from database import db
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 def create_app():
-    app = Flask(__name__, static_folder='static', template_folder='templates')
+    app = Flask(
+        __name__,
+        static_folder=os.path.join(basedir, 'static'),
+        template_folder=os.path.join(basedir, 'templates')
+    )
     app.config.from_object(Config)
 
     db.init_app(app)
@@ -33,16 +39,22 @@ def create_app():
     app.register_blueprint(views)
 
     with app.app_context():
-        db.create_all()
-        # Seed if IPO table is empty
-        from models import IPO
-        if IPO.query.count() == 0:
-            from seed_data import seed_database
-            seed_database()
+        try:
+            db.create_all()
+            from models import IPO
+            if IPO.query.count() == 0:
+                from seed_data import seed_database
+                seed_database()
+        except Exception as e:
+            app.logger.warning(f"Database initialization note: {e}")
         
-        # Start background daily automated live data ingestion scheduler
-        from services.scheduler import scheduler
-        scheduler.start(app)
+        # In serverless environments (Vercel), avoid starting persistent background threads
+        if not os.environ.get('VERCEL'):
+            try:
+                from services.scheduler import scheduler
+                scheduler.start(app)
+            except Exception as e:
+                app.logger.warning(f"Scheduler start note: {e}")
 
     return app
 

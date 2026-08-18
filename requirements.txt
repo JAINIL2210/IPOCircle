@@ -7,7 +7,7 @@ Werkzeug==3.0.3
 Jinja2==3.1.6
 SQLAlchemy==2.0.51
 psycopg2-binary==2.9.9
-redis==5.0.3
-celery==5.3.6
-pytest==8.3.3
 requests==2.31.0
+APScheduler==3.10.4
+esprima==4.0.1
+pytest==8.3.3
